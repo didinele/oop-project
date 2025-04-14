@@ -19,6 +19,7 @@ class Piece
     [[nodiscard]] virtual std::vector<Move> GetPossibleMoves(Board &board) const = 0;
     [[nodiscard]] std::vector<Piece *> GetSeenBy(Board &board) const;
 
+    // TODO: Virtualize
     void MakeMove(Board &board, Move move);
 
     virtual ~Piece();
@@ -33,16 +34,4 @@ class Piece
     Color m_Color;
     Coordinates m_Coordinates;
 };
-
-#define PIECE_TYPE(type)                                                                           \
-    class type : public Piece                                                                      \
-    {                                                                                              \
-      public:                                                                                      \
-        using Piece::Piece;                                                                        \
-        std::vector<Move> GetPossibleMoves(Board &board) const override;                           \
-    }
-
-PIECE_TYPE(KnightPiece);
-PIECE_TYPE(QueenPiece);
-PIECE_TYPE(KingPiece);
 } // namespace game

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include "Piece.h"
+#include "./Piece/Piece.h"
 #include <optional>
 
 namespace game

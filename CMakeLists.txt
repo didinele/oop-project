@@ -31,8 +31,13 @@ set(IMGUI_SOURCES
 add_executable(
     chess
 
+    src/Game/Piece/BishopPiece.cpp
+    src/Game/Piece/KingPiece.cpp
+    src/Game/Piece/KnightPiece.cpp
     src/Game/Piece/PawnPiece.cpp
     src/Game/Piece/Piece.cpp
+    src/Game/Piece/QueenPiece.cpp
+    src/Game/Piece/RookPiece.cpp
 
     src/Game/Common.cpp
     src/Game/Game.cpp

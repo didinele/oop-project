@@ -1,5 +1,7 @@
 #include "Piece.h"
 #include "BishopPiece.h"
+#include "KnightPiece.h"
+#include "QueenPiece.h"
 #include "RookPiece.h"
 #include <cassert>
 #include <optional>
@@ -102,7 +104,8 @@ void Piece::MakeMove(Board &board, Move move)
     BOARD_AT(move.from) = std::nullopt;
 }
 
-std::vector<Move> Piece::GetNaiveMovesInDirections(Board &board, std::vector<std::array<short, 2>> offsets) const
+std::vector<Move>
+Piece::GetNaiveMovesInDirections(Board &board, std::vector<std::array<short, 2>> offsets) const
 {
     std::vector<Move> out;
 
@@ -111,16 +114,22 @@ std::vector<Move> Piece::GetNaiveMovesInDirections(Board &board, std::vector<std
         auto rankOffset = offset[0];
         auto fileOffset = offset[1];
 
-        while (true) {
-            auto to = Coordinates(m_Coordinates.GetRank() + rankOffset, m_Coordinates.GetFile() - fileOffset);
+        while (true)
+        {
+            auto to = Coordinates(
+                m_Coordinates.GetRank() + rankOffset,
+                m_Coordinates.GetFile() - fileOffset
+            );
             if (!to.IsValid())
             {
                 break;
             }
-    
+
             auto piece = BOARD_AT(to);
-            if (piece.has_value()) {
-                if (piece.value()->GetColor() != m_Color) {
+            if (piece.has_value())
+            {
+                if (piece.value()->GetColor() != m_Color)
+                {
                     out.push_back(Move(m_Coordinates, to));
                 }
 

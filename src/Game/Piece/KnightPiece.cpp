@@ -1,0 +1,39 @@
+#include "KnightPiece.h"
+#include <vector>
+
+namespace game
+{
+std::vector<Move> KnightPiece::GetPossibleMoves(Board &board) const
+{
+    std::vector<Move> moves;
+
+    short offsets[8][2] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
+    for (auto &offset : offsets)
+    {
+        auto rankOffset = offset[0];
+        auto fileOffset = offset[1];
+
+        auto to =
+            Coordinates(m_Coordinates.GetRank() + rankOffset, m_Coordinates.GetFile() + fileOffset);
+        if (!to.IsValid())
+        {
+            continue;
+        }
+
+        auto piece = BOARD_AT(to);
+        if (piece.has_value())
+        {
+            if (piece.value()->GetColor() != m_Color)
+            {
+                moves.push_back(Move(m_Coordinates, to));
+            }
+        }
+        else
+        {
+            moves.push_back(Move(m_Coordinates, to));
+        }
+    }
+
+    return moves;
+}
+} // namespace game
