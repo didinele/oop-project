@@ -1,4 +1,6 @@
 #include "Piece.h"
+#include "BishopPiece.h"
+#include "RookPiece.h"
 #include <cassert>
 #include <optional>
 
@@ -98,5 +100,40 @@ void Piece::MakeMove(Board &board, Move move)
     }
 
     BOARD_AT(move.from) = std::nullopt;
+}
+
+std::vector<Move> Piece::GetNaiveMovesInDirections(Board &board, std::vector<std::array<short, 2>> offsets) const
+{
+    std::vector<Move> out;
+
+    for (auto &offset : offsets)
+    {
+        auto rankOffset = offset[0];
+        auto fileOffset = offset[1];
+
+        while (true) {
+            auto to = Coordinates(m_Coordinates.GetRank() + rankOffset, m_Coordinates.GetFile() - fileOffset);
+            if (!to.IsValid())
+            {
+                break;
+            }
+    
+            auto piece = BOARD_AT(to);
+            if (piece.has_value()) {
+                if (piece.value()->GetColor() != m_Color) {
+                    out.push_back(Move(m_Coordinates, to));
+                }
+
+                break;
+            }
+
+            out.push_back(Move(m_Coordinates, to));
+
+            rankOffset += offset[0];
+            fileOffset += offset[1];
+        }
+    }
+
+    return out;
 }
 } // namespace game

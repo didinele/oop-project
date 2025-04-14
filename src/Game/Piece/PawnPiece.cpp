@@ -1,5 +1,4 @@
 #include "PawnPiece.h"
-#include <optional>
 
 namespace game
 {
