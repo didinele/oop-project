@@ -1,6 +1,5 @@
 #pragma once
 
-#include <format>
 #include <string>
 
 namespace game
@@ -21,109 +20,27 @@ enum class GameState
     Ended,
 };
 
-enum class Rank
-{
-    One,
-    Two,
-    Three,
-    Four,
-    Five,
-    Six,
-    Seven,
-    Eight,
-};
-
-enum class File
-{
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G,
-    H,
-};
-
-enum class PieceKind
-{
-    Pawn,
-    Knight,
-    Bishop,
-    Rook,
-    Queen,
-    King,
-};
-
-class Piece
-{
-  public:
-    Piece(PieceKind kind, Color color) : m_Kind(kind), m_Color(color)
-    {
-    }
-
-    PieceKind GetKind() const
-    {
-        return m_Kind;
-    }
-    Color GetColor() const
-    {
-        return m_Color;
-    }
-
-  private:
-    PieceKind m_Kind;
-    Color m_Color;
-};
-
 class Coordinates
 {
   public:
-    constexpr Coordinates(Rank rank, File file) : m_Rank(rank), m_File(file)
-    {
-    }
-    Coordinates(const Coordinates &) = default;
-    Coordinates &operator=(const Coordinates &) = default;
+    Coordinates(short rank, short file);
 
-    Rank GetRank() const
-    {
-        return m_Rank;
-    }
-    File GetFile() const
-    {
-        return m_File;
-    }
+    [[nodiscard]] short GetRank() const;
+    [[nodiscard]] short GetFile() const;
 
-    Coordinates new_with_rank(Rank rank) const
-    {
-        return Coordinates(rank, m_File);
-    }
-    Coordinates new_with_file(File file) const
-    {
-        return Coordinates(m_Rank, file);
-    }
+    [[nodiscard]] Coordinates NewWithRank(short rank) const;
+    [[nodiscard]] Coordinates NewWithFile(short file) const;
 
-    std::string ToString() const
-    {
-        static const char file_names[8] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
-        static const char rank_names[8] = {'1', '2', '3', '4', '5', '6', '7', '8'};
+    [[nodiscard]] std::string ToString() const;
 
-        auto file = file_names[static_cast<int>(m_File)];
-        auto rank = rank_names[static_cast<int>(m_Rank)];
-        return std::format("{}{}", file, rank);
-    }
+    [[nodiscard]] bool IsValid() const;
+    [[nodiscard]] bool IsPromotionSquare(Color color) const;
 
-    bool operator==(const Coordinates &other) const
-    {
-        return m_Rank == other.m_Rank && m_File == other.m_File;
-    }
-    bool operator!=(const Coordinates &other) const
-    {
-        return !(*this == other);
-    }
+    bool operator==(const Coordinates &other) const;
+    bool operator!=(const Coordinates &other) const;
 
   private:
-    Rank m_Rank;
-    File m_File;
+    short m_Rank;
+    short m_File;
 };
 } // namespace game

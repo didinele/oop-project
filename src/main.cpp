@@ -1,5 +1,3 @@
-// TODO: Proper main :)
-
 #include "Game/Game.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"

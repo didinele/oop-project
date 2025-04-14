@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Board.h"
 #include "Common.h"
+#include "Piece.h"
 #include <optional>
 
 namespace game
@@ -9,22 +9,14 @@ namespace game
 class Game
 {
   public:
-    Game() : m_CurrentPlayer(Color::White), m_State(GameState::Waiting)
-    {
-    }
+    Game();
 
-    std::optional<Color> GetCurrentPlayer() const
-    {
-        return m_CurrentPlayer;
-    }
-    GameState GetState() const
-    {
-        return m_State;
-    }
+    [[nodiscard]] std::optional<Color> GetCurrentPlayer() const;
+    [[nodiscard]] GameState GetState() const;
 
   private:
     Color m_CurrentPlayer;
     GameState m_State;
-    game::GameBoard m_Board;
+    Board m_Board;
 };
 } // namespace game
