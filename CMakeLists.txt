@@ -16,7 +16,7 @@ FetchContent_MakeAvailable(glfw)
 
 find_package(OpenGL REQUIRED)
 
-set(IMGUI_DIR src/vendor/imgui)
+set(IMGUI_DIR vendor/imgui)
 set(IMGUI_SOURCES
     ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
     ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
