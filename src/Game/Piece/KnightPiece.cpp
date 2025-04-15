@@ -10,11 +10,14 @@ std::vector<Move> KnightPiece::GetPossibleMoves(Board &board) const
     short offsets[8][2] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
     for (auto &offset : offsets)
     {
-        auto rankOffset = offset[0];
-        auto fileOffset = offset[1];
+        auto rank_offset = offset[0];
+        auto file_offset = offset[1];
 
-        auto to =
-            Coordinates(m_Coordinates.GetRank() + rankOffset, m_Coordinates.GetFile() + fileOffset);
+        auto to = Coordinates(
+            m_Coordinates.GetRank() + rank_offset,
+            m_Coordinates.GetFile() + file_offset
+        );
+
         if (!to.IsValid())
         {
             continue;

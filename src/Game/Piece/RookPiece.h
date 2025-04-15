@@ -15,10 +15,12 @@ enum class RookKind
 class RookPiece : public Piece
 {
   public:
-    RookPiece(Color color, Coordinates coords) : Piece(color, coords), moved(true), m_Kind(RookKind::Noop)
+    RookPiece(Color color, Coordinates coords)
+        : Piece(color, coords), moved(true), m_Kind(RookKind::Noop)
     {
     }
-    RookPiece(Color color, Coordinates coords, RookKind kind) : Piece(color, coords), moved(false), m_Kind(kind)
+    RookPiece(Color color, Coordinates coords, RookKind kind)
+        : Piece(color, coords), moved(false), m_Kind(kind)
     {
     }
     [[nodiscard]] std::vector<Move> GetPossibleMoves(Board &board) const override;

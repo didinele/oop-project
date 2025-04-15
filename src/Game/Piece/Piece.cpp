@@ -212,14 +212,14 @@ Piece::GetNaiveMovesInDirections(Board &board, std::vector<std::array<short, 2>>
 
     for (auto &offset : offsets)
     {
-        auto rankOffset = offset[0];
-        auto fileOffset = offset[1];
+        auto rank_offset = offset[0];
+        auto file_offset = offset[1];
 
         while (true)
         {
             auto to = Coordinates(
-                m_Coordinates.GetRank() + rankOffset,
-                m_Coordinates.GetFile() - fileOffset
+                m_Coordinates.GetRank() + rank_offset,
+                m_Coordinates.GetFile() - file_offset
             );
             if (!to.IsValid())
             {
@@ -239,8 +239,8 @@ Piece::GetNaiveMovesInDirections(Board &board, std::vector<std::array<short, 2>>
 
             out.push_back(Move(m_Coordinates, to));
 
-            rankOffset += offset[0];
-            fileOffset += offset[1];
+            rank_offset += offset[0];
+            file_offset += offset[1];
         }
     }
 

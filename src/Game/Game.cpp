@@ -137,17 +137,22 @@ bool Game::MakeMove(Move move)
     m_CurrentPlayer = m_CurrentPlayer == Color::White ? Color::Black : Color::White;
 
     // Check for stalemate
-    for (auto rank = 0; rank < 8; rank++) {
-        for (auto file = 0; file < 8; file++) {
+    for (auto rank = 0; rank < 8; rank++)
+    {
+        for (auto file = 0; file < 8; file++)
+        {
             auto option = m_Board[rank][file];
-            if (!option.has_value()) {
+            if (!option.has_value())
+            {
                 continue;
             }
 
             auto piece = option.value();
-            if (piece->GetColor() == m_CurrentPlayer) {
+            if (piece->GetColor() == m_CurrentPlayer)
+            {
                 auto moves = piece->GetPossibleMoves(m_Board);
-                if (!moves.empty()) {
+                if (!moves.empty())
+                {
                     return true;
                 }
             }
