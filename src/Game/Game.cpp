@@ -3,8 +3,10 @@
 #include "Piece/KingPiece.h"
 #include "Piece/KnightPiece.h"
 #include "Piece/PawnPiece.h"
+#include "Piece/Piece.h"
 #include "Piece/QueenPiece.h"
 #include "Piece/RookPiece.h"
+#include <cassert>
 #include <optional>
 
 namespace game
@@ -41,7 +43,7 @@ Game::Game() : m_CurrentPlayer(Color::White), m_State(GameState::Waiting)
     }
 }
 
-Game& Game::operator=(const Game &other)
+Game &Game::operator=(const Game &other)
 {
     if (this != &other)
     {
@@ -92,6 +94,50 @@ std::optional<Color> Game::GetCurrentPlayer() const
 GameState Game::GetState() const
 {
     return m_State;
+}
+
+bool Game::MakeMove(Move move)
+{
+    // Considering <Piece>.MakeMove() does not ensure the king is not in check
+    // after the move, the laziest way to do it is to always "simulate" moves
+    // before committing them.
+    Board clone = m_Board;
+    auto piece = operator[](move.from).value();
+    piece->MakeMove(clone, move);
+
+    // Find our king and make sure it is not in check
+    KingPiece *king = nullptr;
+    for (auto rank = 0; rank < 8; rank++)
+    {
+        for (auto file = 0; file < 8; file++)
+        {
+            auto option = clone[rank][file];
+            if (!option.has_value())
+            {
+                continue;
+            }
+
+            auto piece = option.value();
+            if (piece->GetColor() == m_CurrentPlayer)
+            {
+                auto found = dynamic_cast<KingPiece *>(piece);
+                if (found != nullptr)
+                {
+                    king = found;
+                    if (found->IsInCheck(clone))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+
+    m_Board = clone;
+    m_State = king->mated ? GameState::Ended : GameState::Ticking;
+    m_CurrentPlayer = m_CurrentPlayer == Color::White ? Color::Black : Color::White;
+
+    return true;
 }
 
 std::optional<Piece *> Game::operator[](const Coordinates &coordinates)
