@@ -11,4 +11,18 @@ std::vector<Move> RookPiece::GetPossibleMoves(Board &board) const
         {0, 1},   // right
     });
 }
+
+RookKind RookPiece::GetKind() const
+{
+    return m_Kind;
+}
+
+void RookPiece::MakeMove(Board &board, Move move, bool simulate)
+{
+    Piece::MakeMove(board, move, simulate);
+    if (!simulate)
+    {
+        moved = true;
+    }
+}
 } // namespace game

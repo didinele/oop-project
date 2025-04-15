@@ -7,7 +7,9 @@ namespace game
 class BishopPiece : public Piece
 {
   public:
-    using Piece::Piece;
-    std::vector<Move> GetPossibleMoves(Board &board) const override;
+    BishopPiece(Color color, Coordinates coords) : Piece(color, coords)
+    {
+    }
+    [[nodiscard]] std::vector<Move> GetPossibleMoves(Board &board) const override;
 };
 } // namespace game

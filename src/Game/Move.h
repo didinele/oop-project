@@ -13,15 +13,15 @@ enum class PromotionKind
     Queen,
 };
 
-enum class CastleKind {
-  Long,
-  Short
+enum class CastleKind
+{
+    Long,
+    Short
 };
 
-class Move
+struct Move
 {
-  public:
-    static std::vector<Move> GetPromotionMoves(Coordinates from, Coordinates to);
+    [[nodiscard]] static std::vector<Move> GetPromotionMoves(Coordinates from, Coordinates to);
 
     Move(Coordinates from, Coordinates to);
     Move(Coordinates from, Coordinates to, PromotionKind);

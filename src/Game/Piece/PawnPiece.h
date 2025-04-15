@@ -8,8 +8,10 @@ namespace game
 class PawnPiece : public Piece
 {
   public:
-    using Piece::Piece;
-    std::vector<Move> GetPossibleMoves(Board &board) const override;
+    PawnPiece(Color color, Coordinates coords) : Piece(color, coords)
+    {
+    }
+    [[nodiscard]] std::vector<Move> GetPossibleMoves(Board &board) const override;
     std::optional<Move> enPassantMove;
 };
 } // namespace game
