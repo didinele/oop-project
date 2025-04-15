@@ -18,7 +18,7 @@ class Game
 
     // Mostly delegates to <Piece>.MakeMove(), but adds some extra checks and maintains
     // game state.
-    bool MakeMove(Move move);
+    [[nodiscard]] bool MakeMove(Move move);
 
     [[nodiscard]] std::optional<Piece *> operator[](const Coordinates &coordinates);
 

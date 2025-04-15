@@ -12,12 +12,12 @@ enum class Color
 
 enum class GameState
 {
-    // Waiting for the first move/clock isn't yet ticking
+    // Waiting for a move
     Waiting,
-    // Waiting for a move, clock is ticking
-    Ticking,
-    // Game ended
+    // Game ended normally (clock/checkmate/resignation)
     Ended,
+    // Game ended in stalemate
+    Stalemate,
 };
 
 class Coordinates
