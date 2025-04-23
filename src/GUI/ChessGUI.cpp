@@ -87,6 +87,11 @@ void ChessGUI::Render()
 
     ImGui::Begin("Chess Game", nullptr, window_flags);
 
+    auto turn = (m_Game->GetCurrentPlayer() == game::Color::White) ? "White" : "Black";
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Turn: %s", turn);
+
+    // TODO: Add more status indicators (check, checkmate, etc.) here as well
+
     // Determine the largest possible square size that fits within the window
     m_SquareSize = std::min(window_size.x, window_size.y) / 8.0f;
 
@@ -110,14 +115,6 @@ void ChessGUI::Render()
     }
 
     HandleInput();
-
-    auto turn = (m_Game->GetCurrentPlayer() == game::Color::White) ? "White" : "Black";
-    // Position the text top-left
-    ImGui::SetCursorPos(ImVec2(m_BoardStartX, m_BoardStartY - ImGui::GetTextLineHeightWithSpacing())
-    );
-    ImGui::Text("Turn: %s", turn);
-
-    // TODO: Add more status indicators (check, checkmate, etc.)
 
     ImGui::End();
 }
