@@ -14,14 +14,16 @@ namespace game
 {
     std::array<Piece *, 8> pieces;
 
-    pieces[0] = new RookPiece(color, Coordinates(0, 0), RookKind::Short);
-    pieces[1] = new KnightPiece(color, Coordinates(0, 1));
-    pieces[2] = new BishopPiece(color, Coordinates(0, 2));
-    pieces[3] = new QueenPiece(color, Coordinates(0, 3));
-    pieces[4] = new KingPiece(color, Coordinates(0, 4));
-    pieces[5] = new BishopPiece(color, Coordinates(0, 5));
-    pieces[6] = new KnightPiece(color, Coordinates(0, 6));
-    pieces[7] = new RookPiece(color, Coordinates(0, 7), RookKind::Long);
+    auto rank = color == Color::White ? 0 : 7;
+
+    pieces[0] = new RookPiece(color, Coordinates(rank, 0), RookKind::Short);
+    pieces[1] = new KnightPiece(color, Coordinates(rank, 1));
+    pieces[2] = new BishopPiece(color, Coordinates(rank, 2));
+    pieces[3] = new QueenPiece(color, Coordinates(rank, 3));
+    pieces[4] = new KingPiece(color, Coordinates(rank, 4));
+    pieces[5] = new BishopPiece(color, Coordinates(rank, 5));
+    pieces[6] = new KnightPiece(color, Coordinates(rank, 6));
+    pieces[7] = new RookPiece(color, Coordinates(rank, 7), RookKind::Long);
 
     return pieces;
 }
@@ -56,7 +58,7 @@ Game &Game::operator=(const Game &other)
                 auto piece = other.m_Board[rank][file];
                 if (piece.has_value())
                 {
-                    m_Board[rank][file] = piece.value();
+                    m_Board[rank][file] = piece.value()->Clone();
                 }
                 else
                 {
@@ -93,6 +95,11 @@ std::optional<Color> Game::GetCurrentPlayer() const
 GameState Game::GetState() const
 {
     return m_State;
+}
+
+Board Game::GetBoard() const
+{
+    return m_Board;
 }
 
 bool Game::MakeMove(Move move)

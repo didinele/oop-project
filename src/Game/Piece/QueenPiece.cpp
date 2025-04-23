@@ -20,4 +20,8 @@ std::vector<Move> QueenPiece::GetPossibleMoves(Board &board) const
         }
     );
 }
+Piece *QueenPiece::Clone() const
+{
+    return new QueenPiece(m_Color, m_Coordinates);
+}
 } // namespace game

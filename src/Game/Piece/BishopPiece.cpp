@@ -15,4 +15,9 @@ std::vector<Move> BishopPiece::GetPossibleMoves(Board &board) const
         }
     );
 }
+
+Piece *BishopPiece::Clone() const
+{
+    return new BishopPiece(m_Color, m_Coordinates);
+}
 } // namespace game

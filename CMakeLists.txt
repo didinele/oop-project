@@ -43,12 +43,15 @@ add_executable(
     src/Game/Game.cpp
     src/Game/Move.cpp
 
+    src/GUI/ChessGUI.cpp
+
     src/main.cpp
 
     ${IMGUI_SOURCES}
 )
 
 target_include_directories(chess PRIVATE
+    vendor/stb
     ${IMGUI_DIR}
     ${IMGUI_DIR}/backends
     ${IMGUI_DIR}/misc/cpp
@@ -60,3 +63,6 @@ target_link_libraries(chess PRIVATE
     glfw
     OpenGL::GL
 )
+
+# Copy the resources directory to the build output directory
+file(COPY resources DESTINATION ${CMAKE_BINARY_DIR})

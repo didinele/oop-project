@@ -10,7 +10,6 @@
 
 namespace game
 {
-Piece &Piece::operator=(const Piece &other) = default;
 Piece::Piece(Color m_Color, Coordinates coords) : m_Color(m_Color), m_Coordinates(coords)
 {
 }

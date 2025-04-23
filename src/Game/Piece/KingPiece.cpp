@@ -63,6 +63,15 @@ bool KingPiece::IsInCheck(Board &board) const
             auto option = board[rank][file];
             if (option.has_value() && option.value()->GetColor() != m_Color)
             {
+                // (white) KingPiece::GetPossibleMoves() -> KingPiece::CanCastleShort() -> KingPiece::IsInCheck() -> 
+                // (black) KingPiece::GetPossibleMoves()
+                // is a fatal stack overflow infinite recursion. Easiest fix is to
+                // just check if the piece is a king and skip it; since kings can't cause checks anyway
+                if (dynamic_cast<KingPiece *>(option.value()) != nullptr)
+                {
+                    continue;
+                }
+
                 auto moves = option.value()->GetPossibleMoves(board);
                 for (auto &move : moves)
                 {
@@ -246,5 +255,9 @@ void KingPiece::MakeMove(Board &board, Move move, bool simulate)
     {
         m_HasMoved = true;
     }
+}
+Piece *KingPiece::Clone() const
+{
+    return new KingPiece(m_Color, m_Coordinates);
 }
 } // namespace game

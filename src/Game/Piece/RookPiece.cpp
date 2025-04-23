@@ -28,4 +28,8 @@ void RookPiece::MakeMove(Board &board, Move move, bool simulate)
         moved = true;
     }
 }
+Piece *RookPiece::Clone() const
+{
+    return new RookPiece(m_Color, m_Coordinates, m_Kind);
+}
 } // namespace game

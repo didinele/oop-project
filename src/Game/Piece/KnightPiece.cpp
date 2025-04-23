@@ -39,4 +39,8 @@ std::vector<Move> KnightPiece::GetPossibleMoves(Board &board) const
 
     return moves;
 }
+Piece *KnightPiece::Clone() const
+{
+    return new KnightPiece(m_Color, m_Coordinates);
+}
 } // namespace game

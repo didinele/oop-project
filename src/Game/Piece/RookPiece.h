@@ -24,6 +24,7 @@ class RookPiece : public Piece
     {
     }
     [[nodiscard]] std::vector<Move> GetPossibleMoves(Board &board) const override;
+    [[nodiscard]] virtual Piece *Clone() const override;
 
     bool moved;
 

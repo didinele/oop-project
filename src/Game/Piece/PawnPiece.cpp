@@ -75,4 +75,8 @@ std::vector<Move> PawnPiece::GetPossibleMoves(Board &board) const
 
     return out;
 }
+Piece *PawnPiece::Clone() const
+{
+    return new PawnPiece(m_Color, m_Coordinates);
+}
 } // namespace game

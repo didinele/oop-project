@@ -13,9 +13,6 @@ namespace game
 class Piece
 {
   public:
-    // We need to be able to copy pieces for Game to be copy-able
-    virtual Piece &operator=(const Piece &other);
-
     [[nodiscard]] Coordinates GetCoordinates() const;
     [[nodiscard]] Color GetColor() const;
 
@@ -23,6 +20,7 @@ class Piece
     // For instance, this will still return moves that would put the king in check
     // Requiring a tad bit more validation before calling MakeMove
     [[nodiscard]] virtual std::vector<Move> GetPossibleMoves(Board &board) const = 0;
+    [[nodiscard]] virtual Piece *Clone() const = 0;
     [[nodiscard]] std::vector<Piece *> GetSeenBy(Board &board) const;
 
     // Generally, moves returned by `GetPossibleMoves` can be safely passed here.
