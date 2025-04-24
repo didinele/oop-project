@@ -66,6 +66,8 @@ ChessGUI::ChessGUI(game::Game *game) : m_Game(game)
     {
         std::cerr << "Failed to load chess pieces texture!" << std::endl;
     }
+    util::Debugger::Debug("ChessGUI is init. For further debug logs, use the Debug menu.\n");
+    util::Debugger::SetDebugEnabled(false);
 }
 
 ChessGUI::~ChessGUI()
@@ -92,6 +94,23 @@ void ChessGUI::Render()
                                     ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
 
     ImGui::Begin("Chess Game", nullptr, window_flags);
+
+#ifndef NDEBUG
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("Debug"))
+        {
+            bool debug_enabled = util::Debugger::IsDebugEnabled();
+            if (ImGui::Checkbox("Enable Debug Output", &debug_enabled))
+            {
+                util::Debugger::SetDebugEnabled(debug_enabled);
+            }
+
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+#endif
 
     auto turn = (m_Game->GetCurrentPlayer() == game::Color::White) ? "White" : "Black";
     ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Turn: %s", turn);

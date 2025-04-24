@@ -31,13 +31,16 @@ class Debugger
     static void SetDebugEnabled(bool enabled);
     static void Debug(const char *format, ...);
     [[nodiscard]] static ScopedDebugger CreateScope(const char *scope);
+#ifndef NDEBUG
+    [[nodiscard]] static bool IsDebugEnabled();
+#endif
 
   private:
 #ifndef NDEBUG
     static bool s_DebugEnabled;
 #endif
-  static void Write(const char* format, std::va_list args);
+    static void Write(const char *format, std::va_list args);
 
-  friend class ScopedDebugger;
+    friend class ScopedDebugger;
 };
 } // namespace util

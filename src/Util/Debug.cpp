@@ -71,7 +71,7 @@ ScopedDebugger Debugger::CreateScope(const char *scope)
     return ScopedDebugger(scope);
 }
 
-void Debugger::Write(const char* format, va_list args)
+void Debugger::Write(const char *format, va_list args)
 {
     auto required_size_without_prefix = std::vsnprintf(NULL, 0, format, args);
 
@@ -87,4 +87,11 @@ void Debugger::Write(const char* format, va_list args)
     assert(written > 0 && static_cast<unsigned long>(written) < buffer_size);
     std::printf("%s", buffer.data());
 }
+
+#ifndef NDEBUG
+bool Debugger::IsDebugEnabled()
+{
+    return s_DebugEnabled;
+}
+#endif
 } // namespace util
