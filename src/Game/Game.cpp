@@ -16,14 +16,14 @@ namespace game
 
     auto rank = color == Color::White ? 0 : 7;
 
-    pieces[0] = new RookPiece(color, Coordinates(rank, 0), RookKind::Short);
+    pieces[0] = new RookPiece(color, Coordinates(rank, 0), RookKind::Long);
     pieces[1] = new KnightPiece(color, Coordinates(rank, 1));
     pieces[2] = new BishopPiece(color, Coordinates(rank, 2));
     pieces[3] = new QueenPiece(color, Coordinates(rank, 3));
     pieces[4] = new KingPiece(color, Coordinates(rank, 4));
     pieces[5] = new BishopPiece(color, Coordinates(rank, 5));
     pieces[6] = new KnightPiece(color, Coordinates(rank, 6));
-    pieces[7] = new RookPiece(color, Coordinates(rank, 7), RookKind::Long);
+    pieces[7] = new RookPiece(color, Coordinates(rank, 7), RookKind::Short);
 
     return pieces;
 }

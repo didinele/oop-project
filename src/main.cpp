@@ -1,4 +1,5 @@
-#include "GUI/ChessGUI.h" // Include the Chess GUI header
+#include "GUI/ChessGUI.h"
+#include "Util/Debug.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -6,7 +7,7 @@
 
 #define GL_SILENCE_DEPRECATION
 
-#include <GLFW/glfw3.h> // Will drag system OpenGL headers
+#include <GLFW/glfw3.h>
 
 static void glfw_error_callback(int error, const char *description)
 {
@@ -16,8 +17,6 @@ static void glfw_error_callback(int error, const char *description)
 // Main code
 int main(int, char **)
 {
-    game::Game game;
-
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
     {
@@ -77,6 +76,7 @@ int main(int, char **)
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
+    game::Game game;
     gui::ChessGUI chess_gui(&game);
 
     // Background color (dark grey)
@@ -116,6 +116,8 @@ int main(int, char **)
 
         glfwSwapBuffers(window);
     }
+
+    util::Debugger::Debug("[main] Main loop broke off; cleaning up and quitting.");
 
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();

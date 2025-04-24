@@ -1,5 +1,7 @@
 #include "KingPiece.h"
+#include "../../Util/Debug.h"
 #include "RookPiece.h"
+#include <cassert>
 #include <vector>
 
 namespace game
@@ -10,13 +12,15 @@ std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
 
     if (CanCastleShort(board))
     {
-        auto to = m_Color == Color::White ? Coordinates(0, 2) : Coordinates(7, 2);
+        util::Debugger::Debug("[KingPiece::GetPossibleMoves] can castle short\n");
+        auto to = m_Color == Color::White ? Coordinates(0, 6) : Coordinates(7, 6);
         out.push_back(Move(m_Coordinates, to, CastleKind::Short));
     }
 
     if (CanCastleLong(board))
     {
-        auto to = m_Color == Color::White ? Coordinates(0, 6) : Coordinates(7, 6);
+        util::Debugger::Debug("[KingPiece::GetPossibleMoves] can castle long\n");
+        auto to = m_Color == Color::White ? Coordinates(0, 2) : Coordinates(7, 2);
         out.push_back(Move(m_Coordinates, to, CastleKind::Long));
     }
 
@@ -29,7 +33,7 @@ std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
 
         auto to = Coordinates(
             m_Coordinates.GetRank() + rank_offset,
-            m_Coordinates.GetFile() - file_offset
+            m_Coordinates.GetFile() + file_offset
         );
 
         if (!to.IsValid())
@@ -63,10 +67,10 @@ bool KingPiece::IsInCheck(Board &board) const
             auto option = board[rank][file];
             if (option.has_value() && option.value()->GetColor() != m_Color)
             {
-                // (white) KingPiece::GetPossibleMoves() -> KingPiece::CanCastleShort() -> KingPiece::IsInCheck() -> 
-                // (black) KingPiece::GetPossibleMoves()
-                // is a fatal stack overflow infinite recursion. Easiest fix is to
-                // just check if the piece is a king and skip it; since kings can't cause checks anyway
+                // (white) KingPiece::GetPossibleMoves() -> KingPiece::CanCastleShort() ->
+                // KingPiece::IsInCheck() -> (black) KingPiece::GetPossibleMoves() is a fatal stack
+                // overflow infinite recursion. Easiest fix is to just check if the piece is a king
+                // and skip it; since kings can't cause checks anyway
                 if (dynamic_cast<KingPiece *>(option.value()) != nullptr)
                 {
                     continue;
@@ -89,8 +93,10 @@ bool KingPiece::IsInCheck(Board &board) const
 
 bool KingPiece::CanCastleShort(Board &board) const
 {
+    auto scope = util::Debugger::CreateScope("KingPiece::CanCastleShort");
     if (m_HasMoved || IsInCheck(board))
     {
+        scope.Debug("king has already moved or is currently in check\n");
         return false;
     }
 
@@ -101,7 +107,7 @@ bool KingPiece::CanCastleShort(Board &board) const
         for (auto file = 0; file < 8; file++)
         {
             auto option = board[rank][file];
-            if (option.has_value() && option.value()->GetColor() != m_Color)
+            if (!option.has_value() || option.value()->GetColor() != m_Color)
             {
                 continue;
             }
@@ -122,20 +128,22 @@ bool KingPiece::CanCastleShort(Board &board) const
 
     if (!found)
     {
+        scope.Debug("Rook not on the board or has already moved\n");
         return false;
     }
 
     // Collect all opponent pieces' available moves and check if anything can see
     // squares in our path
     Coordinates check_against[2] = {
-        Coordinates(m_Color == Color::White ? 0 : 7, 1),
-        Coordinates(m_Color == Color::White ? 0 : 7, 2),
+        Coordinates(m_Color == Color::White ? 0 : 7, 5),
+        Coordinates(m_Color == Color::White ? 0 : 7, 6),
     };
 
     for (auto &coords : check_against)
     {
         if (BOARD_AT(coords).has_value())
         {
+            scope.Debug("Pieces in way of castling\n");
             return false;
         }
     }
@@ -147,13 +155,23 @@ bool KingPiece::CanCastleShort(Board &board) const
             auto option = board[rank][file];
             if (option.has_value() && option.value()->GetColor() != m_Color)
             {
+                // (white) KingPiece::GetPossibleMoves() -> KingPiece::CanCastleShort() ->
+                // (black) KingPiece::GetPossibleMoves() is a fatal stack overflow infinite
+                // recursion. Easiest fix is to just check if the piece is a king
+                if (dynamic_cast<KingPiece *>(option.value()) != nullptr)
+                {
+                    continue;
+                }
+
                 auto moves = option.value()->GetPossibleMoves(board);
+
                 for (auto &move : moves)
                 {
                     for (auto &check : check_against)
                     {
                         if (move.to == check)
                         {
+                            scope.Debug("Opponent piece can see square in path\n");
                             return false;
                         }
                     }
@@ -167,8 +185,10 @@ bool KingPiece::CanCastleShort(Board &board) const
 
 bool KingPiece::CanCastleLong(Board &board) const
 {
+    auto scope = util::Debugger::CreateScope("KingPiece::CanCastleLong");
     if (m_HasMoved || IsInCheck(board))
     {
+        scope.Debug("king has already moved or is currently in check\n");
         return false;
     }
 
@@ -179,7 +199,7 @@ bool KingPiece::CanCastleLong(Board &board) const
         for (auto file = 0; file < 8; file++)
         {
             auto option = board[rank][file];
-            if (option.has_value() && option.value()->GetColor() != m_Color)
+            if (!option.has_value() || option.value()->GetColor() != m_Color)
             {
                 continue;
             }
@@ -200,27 +220,25 @@ bool KingPiece::CanCastleLong(Board &board) const
 
     if (!found)
     {
+        scope.Debug("Rook not on the board or has already moved\n");
         return false;
     }
 
     // Collect all opponent pieces' available moves and check if anything can see
     // squares in our path
-    Coordinates check_against[2] = {
-        Coordinates(m_Color == Color::White ? 0 : 7, 4),
-        Coordinates(m_Color == Color::White ? 0 : 7, 5),
+    Coordinates check_against[3] = {
+        Coordinates(m_Color == Color::White ? 0 : 7, 1),
+        Coordinates(m_Color == Color::White ? 0 : 7, 2),
+        Coordinates(m_Color == Color::White ? 0 : 7, 3),
     };
 
     for (auto &coords : check_against)
     {
         if (BOARD_AT(coords).has_value())
         {
+            scope.Debug("Pieces in way of castling\n");
             return false;
         }
-    }
-
-    if (board[0][6].has_value())
-    {
-        return false;
     }
 
     for (auto rank = 0; rank < 8; rank++)
@@ -231,12 +249,22 @@ bool KingPiece::CanCastleLong(Board &board) const
             if (option.has_value() && option.value()->GetColor() != m_Color)
             {
                 auto moves = option.value()->GetPossibleMoves(board);
+
+                // (white) KingPiece::GetPossibleMoves() -> KingPiece::CanCastleLong() ->
+                // (black) KingPiece::GetPossibleMoves() is a fatal stack overflow infinite
+                // recursion. Easiest fix is to just check if the piece is a king
+                if (dynamic_cast<KingPiece *>(option.value()) != nullptr)
+                {
+                    continue;
+                }
+
                 for (auto &move : moves)
                 {
                     for (auto &check : check_against)
                     {
                         if (move.to == check)
                         {
+                            scope.Debug("Opponent piece can see square in path\n");
                             return false;
                         }
                     }
@@ -254,6 +282,23 @@ void KingPiece::MakeMove(Board &board, Move move, bool simulate)
     if (!simulate)
     {
         m_HasMoved = true;
+    }
+
+    // If we are castling, move the rook as well
+    if (move.castleKind.has_value())
+    {
+        auto castle_kind = move.castleKind.value();
+        auto rook_rank = m_Color == Color::White ? 0 : 7;
+        auto rook_file = castle_kind == CastleKind::Short ? 7 : 0;
+
+        auto rook = dynamic_cast<RookPiece *>(board[rook_rank][rook_file].value());
+        assert(rook != nullptr);
+
+        auto new_coords = Coordinates(rook_rank, castle_kind == CastleKind::Short ? 5 : 3);
+        rook->SetCoordinates(new_coords);
+        rook->moved = true;
+        BOARD_AT(new_coords) = rook;
+        board[rook_rank][rook_file] = std::nullopt;
     }
 }
 Piece *KingPiece::Clone() const

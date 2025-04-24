@@ -45,6 +45,7 @@ std::vector<Piece *> Piece::GetSeenBy(Board &board) const
             {
                 continue;
             }
+
             auto moves = piece->GetPossibleMoves(board);
             for (auto &move : moves)
             {
@@ -230,7 +231,7 @@ Piece::GetNaiveMovesInDirections(Board &board, std::vector<std::array<short, 2>>
         {
             auto to = Coordinates(
                 m_Coordinates.GetRank() + rank_offset,
-                m_Coordinates.GetFile() - file_offset
+                m_Coordinates.GetFile() + file_offset
             );
             if (!to.IsValid())
             {
