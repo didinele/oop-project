@@ -17,6 +17,10 @@ std::vector<Move> Move::GetPromotionMoves(Coordinates from, Coordinates to)
 Move::Move(Coordinates from, Coordinates to) : from(from), to(to)
 {
 }
+Move::Move(Coordinates from, Coordinates to, Coordinates passanted)
+    : from(from), to(to), passanted(passanted)
+{
+}
 Move::Move(Coordinates from, Coordinates to, PromotionKind promotionKind)
     : from(from), to(to), promotionKind(promotionKind)
 {

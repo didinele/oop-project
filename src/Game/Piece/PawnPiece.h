@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Piece.h"
-#include <optional>
 
 namespace game
 {
@@ -13,6 +12,11 @@ class PawnPiece : public Piece
     }
     [[nodiscard]] std::vector<Move> GetPossibleMoves(Board &board) const override;
     [[nodiscard]] virtual Piece *Clone() const override;
-    std::optional<Move> enPassantMove;
+    std::vector<Move> enPassantMoves;
+
+    void MakeMove(Board &board, Move move, bool simulate) override;
+
+  private:
+    bool m_Moved = false;
 };
 } // namespace game

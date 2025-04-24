@@ -25,6 +25,7 @@ struct Move
     [[nodiscard]] static std::vector<Move> GetPromotionMoves(Coordinates from, Coordinates to);
 
     Move(Coordinates from, Coordinates to);
+    Move(Coordinates from, Coordinates to, Coordinates passanted);
     Move(Coordinates from, Coordinates to, PromotionKind);
     Move(Coordinates from, Coordinates to, CastleKind);
     Move(Coordinates from, Coordinates to, PromotionKind, CastleKind);
@@ -32,6 +33,7 @@ struct Move
     Coordinates from;
     Coordinates to;
 
+    std::optional<Coordinates> passanted;
     std::optional<PromotionKind> promotionKind;
     std::optional<CastleKind> castleKind;
 };

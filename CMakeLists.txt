@@ -45,6 +45,8 @@ add_executable(
 
     src/GUI/ChessGUI.cpp
 
+    src/Util/Debug.cpp
+
     src/main.cpp
 
     ${IMGUI_SOURCES}

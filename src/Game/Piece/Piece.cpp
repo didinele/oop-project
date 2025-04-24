@@ -18,6 +18,10 @@ Coordinates Piece::GetCoordinates() const
 {
     return m_Coordinates;
 }
+void Piece::SetCoordinates(Coordinates coords)
+{
+    m_Coordinates = coords;
+}
 Color Piece::GetColor() const
 {
     return m_Color;
@@ -66,6 +70,13 @@ void Piece::MakeMove(Board &board, Move move, bool simulate)
         delete piece;
     }
 
+    if (move.passanted.has_value())
+    {
+        auto piece = BOARD_AT(move.passanted.value()).value();
+        delete piece;
+        BOARD_AT(move.passanted.value()) = std::nullopt;
+    }
+
     // Actually make the move by swapping out the pointers
     if (move.promotionKind.has_value())
     {
@@ -101,6 +112,7 @@ void Piece::MakeMove(Board &board, Move move, bool simulate)
     }
     else
     {
+        BOARD_AT(move.from).value()->SetCoordinates(move.to);
         to = BOARD_AT(move.from);
     }
 
@@ -132,7 +144,7 @@ void Piece::MakeMove(Board &board, Move move, bool simulate)
                 auto pawn = dynamic_cast<PawnPiece *>(piece);
                 if (pawn != nullptr)
                 {
-                    pawn->enPassantMove = std::nullopt;
+                    pawn->enPassantMoves = std::vector<Move>();
                 }
             }
 

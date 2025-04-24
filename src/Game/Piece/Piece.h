@@ -14,6 +14,7 @@ class Piece
 {
   public:
     [[nodiscard]] Coordinates GetCoordinates() const;
+    void SetCoordinates(Coordinates coords);
     [[nodiscard]] Color GetColor() const;
 
     // Gets moves this piece can make, without accounting for much game state.

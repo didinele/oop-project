@@ -8,6 +8,7 @@
 #include "../Game/Piece/Piece.h"
 #include "../Game/Piece/QueenPiece.h"
 #include "../Game/Piece/RookPiece.h"
+#include "../Util/Debug.h"
 #include "ChessGUI.h"
 #include <algorithm>
 #include <iostream>
@@ -48,8 +49,13 @@ bool ChessGUI::LoadPiecesTexture(const char *filename)
     stbi_image_free(data);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::cout << "Texture loaded successfully: " << filename << " (" << width << "x" << height
-              << ", " << channels_in_file << " channels in file, loaded as RGBA)" << std::endl;
+    util::Debugger::Debug(
+        "Loaded texture: %s (%d x %d, %d channels in file, loaded as RGBA)\n",
+        filename,
+        width,
+        height,
+        channels_in_file
+    );
 
     return m_PiecesTextureID != 0;
 }
@@ -221,13 +227,14 @@ void ChessGUI::DrawPieces(ImDrawList &drawList)
     }
 }
 
-// ... HandleInput remains the same ...
 void ChessGUI::HandleInput()
 {
-    auto mouse_pos_rel = ImGui::GetMousePos();
+    auto input_debugger = util::Debugger::CreateScope("ChessGUI::HandleInput");
 
-    bool is_mouse_over_board = false;
+    auto mouse_pos_rel = ImGui::GetMousePos();
+    auto is_mouse_over_board = false;
     auto coords_option = GetCoordsFromScreenPos(mouse_pos_rel);
+
     if (coords_option.has_value())
     {
         is_mouse_over_board = true;
@@ -260,21 +267,28 @@ void ChessGUI::HandleInput()
 
             if (is_move_target)
             {
+                input_debugger.Debug(
+                    "Found within PossibleMoves, trying: from %d,%d to %d,%d.\n",
+                    m_SelectedSquare.value().GetRank(),
+                    m_SelectedSquare.value().GetFile(),
+                    clicked_coords.GetRank(),
+                    clicked_coords.GetFile()
+                );
                 auto move_made = m_Game->MakeMove(move_to_make);
-                if (move_made)
-                {
-                    m_SelectedSquare = std::nullopt;
-                    m_PossibleMovesForSelected.clear();
-                }
-                else
-                {
-                    // Deselect the piece if the move was invalid
-                    m_SelectedSquare = std::nullopt;
-                    m_PossibleMovesForSelected.clear();
-                }
+                input_debugger.Debug("Move made: %s\n", move_made ? "true" : "false");
+
+                // Deselect regardless of outcome
+                m_SelectedSquare = std::nullopt;
+                m_PossibleMovesForSelected.clear();
             }
             else
             {
+                input_debugger.Debug(
+                    "Clicked square: %d,%d, but not a valid move target.\n",
+                    clicked_coords.GetRank(),
+                    clicked_coords.GetFile()
+                );
+
                 // If the user clicked a diff. piece of their color, select that instead
                 if (clicked_square_option.has_value() &&
                     clicked_square_option.value()->GetColor() == m_Game->GetCurrentPlayer())
@@ -302,9 +316,21 @@ void ChessGUI::HandleInput()
                 // Get valid moves for the selected piece
                 auto board = m_Game->GetBoard();
                 m_PossibleMovesForSelected = clicked_square_option.value()->GetPossibleMoves(board);
+                input_debugger.Debug(
+                    "Selected square: %d,%d, possible move count: %zu\n",
+                    clicked_coords.GetRank(),
+                    clicked_coords.GetFile(),
+                    m_PossibleMovesForSelected.size()
+                );
             }
             else
             {
+                input_debugger.Debug(
+                    "Clicked square: %d,%d, but no piece or not the current player's "
+                    "piece.\n",
+                    clicked_coords.GetRank(),
+                    clicked_coords.GetFile()
+                );
                 // Clicked empty square or opponent piece - do nothing
                 m_SelectedSquare = std::nullopt;
                 m_PossibleMovesForSelected.clear();
