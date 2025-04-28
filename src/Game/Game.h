@@ -11,7 +11,7 @@ class Game
   public:
     Game();
     Game(const Game &other) = delete;
-    Game &operator=(const Game &other);
+    Game &operator=(const Game &other) = delete;
     ~Game();
 
     [[nodiscard]] std::optional<Color> GetCurrentPlayer() const;
@@ -28,5 +28,7 @@ class Game
     Color m_CurrentPlayer;
     GameState m_State;
     Board m_Board;
+
+    [[nodiscard]] Board CloneBoard() const;
 };
 } // namespace game

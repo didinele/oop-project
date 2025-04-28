@@ -1,4 +1,4 @@
-# oop-project
+# oop-project - Chess GUI
 
 ## Build
 

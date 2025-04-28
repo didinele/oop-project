@@ -117,7 +117,7 @@ int main(int, char **)
         glfwSwapBuffers(window);
     }
 
-    util::Debugger::Debug("[main] Main loop broke off; cleaning up and quitting.");
+    util::Debugger::Debug("[main] Main loop broke off; cleaning up and quitting.\n");
 
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();

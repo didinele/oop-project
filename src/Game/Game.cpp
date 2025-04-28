@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "../Util/Debug.h"
 #include "Piece/BishopPiece.h"
 #include "Piece/KingPiece.h"
 #include "Piece/KnightPiece.h"
@@ -44,33 +45,6 @@ Game::Game() : m_CurrentPlayer(Color::White), m_State(GameState::Waiting)
     }
 }
 
-Game &Game::operator=(const Game &other)
-{
-    if (this != &other)
-    {
-        m_CurrentPlayer = other.m_CurrentPlayer;
-        m_State = other.m_State;
-
-        for (auto rank = 0; rank < 8; rank++)
-        {
-            for (auto file = 0; file < 8; file++)
-            {
-                auto piece = other.m_Board[rank][file];
-                if (piece.has_value())
-                {
-                    m_Board[rank][file] = piece.value()->Clone();
-                }
-                else
-                {
-                    m_Board[rank][file] = std::nullopt;
-                }
-            }
-        }
-    }
-
-    return *this;
-}
-
 Game::~Game()
 {
     for (auto rank = 0; rank < 8; rank++)
@@ -107,8 +81,8 @@ bool Game::MakeMove(Move move)
     // Considering <Piece>.MakeMove() does not ensure the king is not in check
     // after the move, the laziest way to do it is to always "simulate" moves
     // before committing them.
-    Board clone = m_Board;
-    auto piece = operator[](move.from).value();
+    auto clone = CloneBoard();
+    auto piece = clone[move.from.GetRank()][move.from.GetFile()].value();
     piece->MakeMove(clone, move);
 
     // Find our king and make sure it is not in check
@@ -132,6 +106,7 @@ bool Game::MakeMove(Move move)
                     king = found;
                     if (found->IsInCheck(clone))
                     {
+                        util::Debugger::Debug("[Game::MakeMove] King is in check after move\n");
                         return false;
                     }
                 }
@@ -140,6 +115,8 @@ bool Game::MakeMove(Move move)
     }
 
     m_Board = clone;
+    operator[](move.from) = std::nullopt;
+    operator[](move.to) = piece->Clone();
     m_State = king->mated ? GameState::Ended : GameState::Waiting;
     m_CurrentPlayer = m_CurrentPlayer == Color::White ? Color::Black : Color::White;
 
@@ -175,5 +152,26 @@ bool Game::MakeMove(Move move)
 std::optional<Piece *> Game::operator[](const Coordinates &coordinates)
 {
     return m_Board[coordinates.GetRank()][coordinates.GetFile()];
+}
+
+Board Game::CloneBoard() const
+{
+    Board clone;
+    for (auto rank = 0; rank < 8; rank++)
+    {
+        for (auto file = 0; file < 8; file++)
+        {
+            auto option = m_Board[rank][file];
+            if (option.has_value())
+            {
+                clone[rank][file] = option.value()->Clone();
+            }
+            else
+            {
+                clone[rank][file] = std::nullopt;
+            }
+        }
+    }
+    return clone;
 }
 } // namespace game

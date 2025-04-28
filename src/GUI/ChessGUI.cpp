@@ -113,9 +113,24 @@ void ChessGUI::Render()
 #endif
 
     auto turn = (m_Game->GetCurrentPlayer() == game::Color::White) ? "White" : "Black";
-    ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Turn: %s", turn);
 
     // TODO: Add more status indicators (check, checkmate, etc.) here as well
+    auto state = m_Game->GetState();
+    switch (state)
+    {
+        case game::GameState::Waiting: {
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s to move", turn);
+            break;
+        }
+        case game::GameState::Ended: {
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s lost by checkmate", turn);
+            break;
+        }
+        case game::GameState::Stalemate: {
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Draw by stalement");
+            break;
+        }
+    }
 
     // Determine the largest possible square size that fits within the window
     m_SquareSize = std::min(window_size.x, window_size.y) / 8.0f;
@@ -248,7 +263,13 @@ void ChessGUI::DrawPieces(ImDrawList &drawList)
 
 void ChessGUI::HandleInput()
 {
-    auto input_debugger = util::Debugger::CreateScope("ChessGUI::HandleInput");
+    auto scope = util::Debugger::CreateScope("ChessGUI::HandleInput");
+
+    if (m_Game->GetState() != game::GameState::Waiting)
+    {
+        scope.Debug("Game is over. Ignoring mouse input.\n");
+        return;
+    }
 
     auto mouse_pos_rel = ImGui::GetMousePos();
     auto is_mouse_over_board = false;
@@ -286,15 +307,16 @@ void ChessGUI::HandleInput()
 
             if (is_move_target)
             {
-                input_debugger.Debug(
+                scope.Debug(
                     "Found within PossibleMoves, trying: from %d,%d to %d,%d.\n",
                     m_SelectedSquare.value().GetRank(),
                     m_SelectedSquare.value().GetFile(),
                     clicked_coords.GetRank(),
                     clicked_coords.GetFile()
                 );
+
                 auto move_made = m_Game->MakeMove(move_to_make);
-                input_debugger.Debug("Move made: %s\n", move_made ? "true" : "false");
+                scope.Debug("Move made: %s\n", move_made ? "true" : "false");
 
                 // Deselect regardless of outcome
                 m_SelectedSquare = std::nullopt;
@@ -302,7 +324,7 @@ void ChessGUI::HandleInput()
             }
             else
             {
-                input_debugger.Debug(
+                scope.Debug(
                     "Clicked square: %d,%d, but not a valid move target.\n",
                     clicked_coords.GetRank(),
                     clicked_coords.GetFile()
@@ -335,7 +357,7 @@ void ChessGUI::HandleInput()
                 // Get valid moves for the selected piece
                 auto board = m_Game->GetBoard();
                 m_PossibleMovesForSelected = clicked_square_option.value()->GetPossibleMoves(board);
-                input_debugger.Debug(
+                scope.Debug(
                     "Selected square: %d,%d, possible move count: %zu\n",
                     clicked_coords.GetRank(),
                     clicked_coords.GetFile(),
@@ -344,7 +366,7 @@ void ChessGUI::HandleInput()
             }
             else
             {
-                input_debugger.Debug(
+                scope.Debug(
                     "Clicked square: %d,%d, but no piece or not the current player's "
                     "piece.\n",
                     clicked_coords.GetRank(),
