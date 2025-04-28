@@ -81,11 +81,10 @@ ChessGUI::~ChessGUI()
 
 void ChessGUI::Render()
 {
-    // ... existing Render setup code ...
     auto viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
-    auto window_size = viewport->WorkSize; // Get the available size
+    auto window_size = viewport->WorkSize;
 
     // Non-interactive and borderless
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
@@ -114,7 +113,6 @@ void ChessGUI::Render()
 
     auto turn = (m_Game->GetCurrentPlayer() == game::Color::White) ? "White" : "Black";
 
-    // TODO: Add more status indicators (check, checkmate, etc.) here as well
     auto state = m_Game->GetState();
     switch (state)
     {
@@ -127,7 +125,7 @@ void ChessGUI::Render()
             break;
         }
         case game::GameState::Stalemate: {
-            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Draw by stalement");
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Draw by stalemate");
             break;
         }
     }
@@ -265,9 +263,13 @@ void ChessGUI::HandleInput()
 {
     auto scope = util::Debugger::CreateScope("ChessGUI::HandleInput");
 
+    static bool logged_game_over = false;
     if (m_Game->GetState() != game::GameState::Waiting)
     {
-        scope.Debug("Game is over. Ignoring mouse input.\n");
+        if (!logged_game_over)
+        {
+            scope.Debug("Game is over. Ignoring mouse input.\n");
+        }
         return;
     }
 
