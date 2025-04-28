@@ -1,4 +1,5 @@
 #include "Piece.h"
+#include "../../Util/Debug.h"
 #include "BishopPiece.h"
 #include "KingPiece.h"
 #include "KnightPiece.h"
@@ -62,17 +63,21 @@ std::vector<Piece *> Piece::GetSeenBy(Board &board) const
 
 void Piece::MakeMove(Board &board, Move move, bool simulate)
 {
+    auto scope = util::Debugger::CreateScope("Piece::MakeMove");
+
     auto &to = BOARD_AT(move.to);
 
     // Free the memory for the captured piece (if any)
     if (to.has_value())
     {
+        scope.Debug("Captured piece at %s\n", move.to.ToString().c_str());
         auto piece = to.value();
         delete piece;
     }
 
     if (move.passanted.has_value())
     {
+        scope.Debug("Captured en passant at %s\n", move.passanted.value().ToString().c_str());
         auto piece = BOARD_AT(move.passanted.value()).value();
         delete piece;
         BOARD_AT(move.passanted.value()) = std::nullopt;
@@ -162,6 +167,7 @@ void Piece::MakeMove(Board &board, Move move, bool simulate)
     // Step 1. King is in check and has no legal moves
     if (enemy_king->IsInCheck(board) && enemy_king->GetPossibleMoves(board).empty())
     {
+        scope.Debug("King is in check and has empty GetPossibleMoves\n");
         bool can_escape = false;
 
         // Now, let's look for all the legal moves of the opponent's piece.
@@ -176,13 +182,13 @@ void Piece::MakeMove(Board &board, Move move, bool simulate)
                 }
 
                 auto possible_moves = option.value()->GetPossibleMoves(board);
-                for (const auto &test_move : possible_moves)
+                for (auto &test_move : possible_moves)
                 {
                     // Step 2. Now that we have possible moves, we need to check if any of them
                     // can escape the check. To simplify our logic, despite the perhaps poor
                     // performance, we're just gonna deep clone the board and run the move on it
                     // arbitrarily.
-                    Board temp_board = board;
+                    auto temp_board = CloneBoard(board);
 
                     auto piece =
                         temp_board[test_move.from.GetRank()][test_move.from.GetFile()].value();
@@ -212,6 +218,7 @@ void Piece::MakeMove(Board &board, Move move, bool simulate)
 
         if (!can_escape)
         {
+            scope.Debug("King is mated\n");
             enemy_king->mated = true;
         }
     }
@@ -257,5 +264,26 @@ Piece::GetNaiveMovesInDirections(Board &board, std::vector<std::array<short, 2>>
     }
 
     return out;
+}
+
+Board CloneBoard(Board &board)
+{
+    Board clone;
+    for (auto rank = 0; rank < 8; rank++)
+    {
+        for (auto file = 0; file < 8; file++)
+        {
+            auto option = board[rank][file];
+            if (option.has_value())
+            {
+                clone[rank][file] = option.value()->Clone();
+            }
+            else
+            {
+                clone[rank][file] = std::nullopt;
+            }
+        }
+    }
+    return clone;
 }
 } // namespace game

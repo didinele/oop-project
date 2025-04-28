@@ -51,7 +51,38 @@ std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
         }
         else
         {
-            out.push_back(Move(m_Coordinates, to));
+            // Make sure the square isn't seen by an enemy piece
+            bool seen = false;
+            for (auto rank = 0; rank < 8 && !seen; rank++)
+            {
+                for (auto file = 0; file < 8; file++)
+                {
+                    auto option = board[rank][file];
+                    if (option.has_value() && option.value()->GetColor() != m_Color)
+                    {
+                        // Prevent the classic infinite recursion
+                        if (dynamic_cast<KingPiece *>(option.value()) != nullptr)
+                        {
+                            continue;
+                        }
+
+                        auto moves = option.value()->GetPossibleMoves(board);
+                        for (auto &move : moves)
+                        {
+                            if (move.to == to)
+                            {
+                                seen = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!seen)
+            {
+                out.push_back(Move(m_Coordinates, to));
+            }
         }
     }
 

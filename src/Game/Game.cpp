@@ -81,12 +81,13 @@ bool Game::MakeMove(Move move)
     // Considering <Piece>.MakeMove() does not ensure the king is not in check
     // after the move, the laziest way to do it is to always "simulate" moves
     // before committing them.
-    auto clone = CloneBoard();
+    auto clone = CloneBoard(m_Board);
     auto piece = clone[move.from.GetRank()][move.from.GetFile()].value();
     piece->MakeMove(clone, move);
 
     // Find our king and make sure it is not in check
-    KingPiece *king = nullptr;
+    KingPiece *king = nullptr, *enemy_king = nullptr;
+
     for (auto rank = 0; rank < 8; rank++)
     {
         for (auto file = 0; file < 8; file++)
@@ -110,6 +111,12 @@ bool Game::MakeMove(Move move)
                         return false;
                     }
                 }
+            } else {
+                auto found = dynamic_cast<KingPiece *>(piece);
+                if (found != nullptr)
+                {
+                    enemy_king = found;
+                }
             }
         }
     }
@@ -117,7 +124,7 @@ bool Game::MakeMove(Move move)
     m_Board = clone;
     operator[](move.from) = std::nullopt;
     operator[](move.to) = piece->Clone();
-    m_State = king->mated ? GameState::Ended : GameState::Waiting;
+    m_State = king->mated || enemy_king->mated ? GameState::Ended : GameState::Waiting;
     m_CurrentPlayer = m_CurrentPlayer == Color::White ? Color::Black : Color::White;
 
     // Check for stalemate
@@ -152,26 +159,5 @@ bool Game::MakeMove(Move move)
 std::optional<Piece *> Game::operator[](const Coordinates &coordinates)
 {
     return m_Board[coordinates.GetRank()][coordinates.GetFile()];
-}
-
-Board Game::CloneBoard() const
-{
-    Board clone;
-    for (auto rank = 0; rank < 8; rank++)
-    {
-        for (auto file = 0; file < 8; file++)
-        {
-            auto option = m_Board[rank][file];
-            if (option.has_value())
-            {
-                clone[rank][file] = option.value()->Clone();
-            }
-            else
-            {
-                clone[rank][file] = std::nullopt;
-            }
-        }
-    }
-    return clone;
 }
 } // namespace game

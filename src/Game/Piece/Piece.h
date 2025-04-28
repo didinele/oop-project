@@ -9,7 +9,6 @@
 
 namespace game
 {
-
 class Piece
 {
   public:
@@ -51,4 +50,6 @@ class Piece
     Color m_Color;
     Coordinates m_Coordinates;
 };
+
+Board CloneBoard(Board &board);
 } // namespace game

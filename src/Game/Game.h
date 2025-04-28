@@ -28,7 +28,5 @@ class Game
     Color m_CurrentPlayer;
     GameState m_State;
     Board m_Board;
-
-    [[nodiscard]] Board CloneBoard() const;
 };
 } // namespace game
