@@ -20,6 +20,9 @@ class ChessGUI
 
   private:
     game::Game *m_Game;
+
+    bool m_DrawProposed = false;
+    game::Color m_DrawProposedFor = game::Color::White;
     
     bool m_FlipBoardOnMove = true;
     bool m_IsNormalBoardView = true;

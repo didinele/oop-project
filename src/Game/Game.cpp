@@ -61,7 +61,7 @@ Game::~Game()
     }
 }
 
-std::optional<Color> Game::GetCurrentPlayer() const
+Color Game::GetCurrentPlayer() const
 {
     return m_CurrentPlayer;
 }
@@ -74,6 +74,11 @@ GameState Game::GetState() const
 Board Game::GetBoard() const
 {
     return m_Board;
+}
+
+void Game::Draw()
+{
+    this->m_State = GameState::Draw;
 }
 
 bool Game::MakeMove(Move move)

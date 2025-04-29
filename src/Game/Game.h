@@ -14,9 +14,11 @@ class Game
     Game &operator=(const Game &other) = delete;
     ~Game();
 
-    [[nodiscard]] std::optional<Color> GetCurrentPlayer() const;
+    [[nodiscard]] Color GetCurrentPlayer() const;
     [[nodiscard]] GameState GetState() const;
     [[nodiscard]] Board GetBoard() const;
+
+    void Draw();
 
     // Mostly delegates to <Piece>.MakeMove(), but adds some extra checks and maintains
     // game state.

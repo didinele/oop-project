@@ -12,8 +12,8 @@
 #include "../Game/Piece/QueenPiece.h"
 #include "../Game/Piece/RookPiece.h"
 #include "../Util/Debug.h"
-#include "imgui.h"
 #include "ChessGUI.h"
+#include "imgui.h"
 #include <algorithm>
 #include <iostream>
 
@@ -100,6 +100,38 @@ void ChessGUI::Render()
 
     if (ImGui::BeginMainMenuBar())
     {
+        if (ImGui::BeginMenu("Game"))
+        {
+            if (m_DrawProposed)
+            {
+                if (m_DrawProposedFor == m_Game->GetCurrentPlayer())
+                {
+
+                    if (ImGui::MenuItem("Accept Draw"))
+                    {
+                        m_Game->Draw();
+                        m_DrawProposed = false;
+                    }
+                    if (ImGui::MenuItem("Decline Draw"))
+                    {
+                        m_DrawProposed = false;
+                    }
+                }
+            }
+            else if (!m_DrawProposed && m_Game->GetState() == game::GameState::Waiting)
+            {
+                if (ImGui::MenuItem("Propose Draw"))
+                {
+                    m_DrawProposed = true;
+                    m_DrawProposedFor = m_Game->GetCurrentPlayer() == game::Color::White
+                                            ? game::Color::Black
+                                            : game::Color::White;
+                }
+            }
+
+            ImGui::EndMenu();
+        }
+
         if (ImGui::BeginMenu("View"))
         {
             if (ImGui::MenuItem("Flip Board"))
@@ -143,8 +175,8 @@ void ChessGUI::Render()
             ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s lost by checkmate", turn);
             break;
         }
-        case game::GameState::Stalemate: {
-            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Draw by stalemate");
+        case game::GameState::Draw: {
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Draw by agreement");
             break;
         }
     }
@@ -288,6 +320,7 @@ void ChessGUI::HandleInput()
         if (!logged_game_over)
         {
             scope.Debug("Game is over. Ignoring mouse input.\n");
+            logged_game_over = true;
         }
         return;
     }
@@ -339,10 +372,21 @@ void ChessGUI::HandleInput()
                 auto move_made = m_Game->MakeMove(move_to_make);
                 scope.Debug("Move made: %s\n", move_made ? "true" : "false");
 
-                if (move_made && m_FlipBoardOnMove)
+                if (move_made)
                 {
-                    m_IsNormalBoardView = m_Game->GetCurrentPlayer() == game::Color::White;
-                    scope.Debug("Swapped board view\n");
+                    // Note the inverted check, since at this point GetCurrentPlayer is flipped
+                    if (m_DrawProposed && m_DrawProposedFor != m_Game->GetCurrentPlayer())
+                    {
+                        // Implicitly rejected
+                        scope.Debug("Draw proposal implicitly rejected\n");
+                        m_DrawProposed = false;
+                    }
+
+                    if (m_FlipBoardOnMove)
+                    {
+                        m_IsNormalBoardView = m_Game->GetCurrentPlayer() == game::Color::White;
+                        scope.Debug("Swapped board view\n");
+                    }
                 }
 
                 // Deselect regardless of outcome
