@@ -108,6 +108,7 @@ bool Game::MakeMove(Move move)
                     if (found->IsInCheck(clone))
                     {
                         util::Debugger::Debug("[Game::MakeMove] King is in check after move\n");
+                        FreeBoard(clone);
                         return false;
                     }
                 }
