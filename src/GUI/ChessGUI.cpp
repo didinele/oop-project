@@ -1,3 +1,6 @@
+// TODO: Highlights should be on top of pieces
+// TODO: Resignations
+
 // No idea how this header is written, but if its not our first include, we aren't compiling
 #include <OpenGL/gl3.h>
 
@@ -97,7 +100,6 @@ void ChessGUI::Render()
 
     if (ImGui::BeginMainMenuBar())
     {
-#ifndef NDEBUG
         if (ImGui::BeginMenu("View"))
         {
             if (ImGui::MenuItem("Swap Board View"))
@@ -113,6 +115,7 @@ void ChessGUI::Render()
             ImGui::EndMenu();
         }
 
+#ifndef NDEBUG
         if (ImGui::BeginMenu("Debug"))
         {
             bool debug_enabled = util::Debugger::IsDebugEnabled();

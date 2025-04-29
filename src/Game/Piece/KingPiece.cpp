@@ -44,7 +44,10 @@ std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
         auto piece = BOARD_AT(to);
         if (piece.has_value())
         {
-            if (piece.value()->GetColor() != m_Color && piece.value()->GetSeenBy(board).empty())
+            // In the past, we checked `piece.value()->GetSeenBy(board).empty()`. That is infinitely recursive
+            // (GetSeenBy calls GetPossibleMoves for all pieces, including this very one). Let's just compromise and not
+            // check. Game will undo the move anyways if it puts the king into check.
+            if (piece.value()->GetColor() != m_Color)
             {
                 out.push_back(Move(m_Coordinates, to));
             }
