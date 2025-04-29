@@ -102,12 +102,12 @@ void ChessGUI::Render()
     {
         if (ImGui::BeginMenu("View"))
         {
-            if (ImGui::MenuItem("Swap Board View"))
+            if (ImGui::MenuItem("Flip Board"))
             {
                 m_IsNormalBoardView = !m_IsNormalBoardView;
             }
 
-            if (ImGui::Checkbox("Swap Board View on Move", &m_SwapBoardViewOnMove))
+            if (ImGui::Checkbox("Flip Board on Move", &m_FlipBoardOnMove))
             {
                 // no-op
             }
@@ -339,7 +339,7 @@ void ChessGUI::HandleInput()
                 auto move_made = m_Game->MakeMove(move_to_make);
                 scope.Debug("Move made: %s\n", move_made ? "true" : "false");
 
-                if (move_made && m_SwapBoardViewOnMove)
+                if (move_made && m_FlipBoardOnMove)
                 {
                     m_IsNormalBoardView = m_Game->GetCurrentPlayer() == game::Color::White;
                     scope.Debug("Swapped board view\n");

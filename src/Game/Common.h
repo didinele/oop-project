@@ -16,8 +16,6 @@ enum class GameState
     Waiting,
     // Game ended normally (clock/checkmate/resignation)
     Ended,
-    // Game ended in stalemate
-    Stalemate,
 };
 
 class Coordinates

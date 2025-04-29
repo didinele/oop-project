@@ -27,6 +27,7 @@ Color Piece::GetColor() const
 {
     return m_Color;
 }
+// TODO: Fix bug where pawn up counts as being "seen by"
 std::vector<Piece *> Piece::GetSeenBy(Board &board) const
 {
     std::vector<Piece *> out;

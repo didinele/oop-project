@@ -129,32 +129,6 @@ bool Game::MakeMove(Move move)
     m_State = king->mated || enemy_king->mated ? GameState::Ended : GameState::Waiting;
     m_CurrentPlayer = m_CurrentPlayer == Color::White ? Color::Black : Color::White;
 
-    // Check for stalemate
-    for (auto rank = 0; rank < 8; rank++)
-    {
-        for (auto file = 0; file < 8; file++)
-        {
-            auto option = m_Board[rank][file];
-            if (!option.has_value())
-            {
-                continue;
-            }
-
-            auto piece = option.value();
-            if (piece->GetColor() == m_CurrentPlayer)
-            {
-                auto moves = piece->GetPossibleMoves(m_Board);
-                if (!moves.empty())
-                {
-                    return true;
-                }
-            }
-        }
-    }
-
-    // If we're here, we could not find any legal moves. This means we're in stalemate.
-    m_State = GameState::Stalemate;
-
     return true;
 }
 

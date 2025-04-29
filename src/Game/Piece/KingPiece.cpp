@@ -4,6 +4,8 @@
 #include <cassert>
 #include <vector>
 
+static short offsets[8][2] = {{1, 0}, {1, 1}, {1, -1}, {-1, 0}, {-1, 1}, {-1, -1}, {0, 1}, {0, -1}};
+
 namespace game
 {
 std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
@@ -23,8 +25,6 @@ std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
         auto to = m_Color == Color::White ? Coordinates(0, 2) : Coordinates(7, 2);
         out.push_back(Move(m_Coordinates, to, CastleKind::Long));
     }
-
-    short offsets[8][2] = {{1, 0}, {1, 1}, {1, -1}, {-1, 0}, {-1, 1}, {-1, -1}, {0, 1}, {0, -1}};
 
     for (auto &offset : offsets)
     {
@@ -104,9 +104,28 @@ bool KingPiece::IsInCheck(Board &board) const
                 // (white) KingPiece::GetPossibleMoves() -> KingPiece::CanCastleShort() ->
                 // KingPiece::IsInCheck() -> (black) KingPiece::GetPossibleMoves() is a fatal stack
                 // overflow infinite recursion. Easiest fix is to just check if the piece is a king
-                // and skip it; since kings can't cause checks anyway
+                // and skip it. Problem is, this skip makes it so kings can end up next to each other.
+                // We account for this by checking if this king we just found is on an adjacent square
                 if (dynamic_cast<KingPiece *>(option.value()) != nullptr)
                 {
+                    auto king_coords = option.value()->GetCoordinates();
+                    for (auto &offset : offsets)
+                    {
+                        auto rank_offset = offset[0];
+                        auto file_offset = offset[1];
+
+                        auto to = Coordinates(
+                            king_coords.GetRank() + rank_offset,
+                            king_coords.GetFile() + file_offset
+                        );
+
+                        if (to == m_Coordinates)
+                        {
+                            util::Debugger::Debug("[KingPiece::IsInCheck] king is next to enemy king\n");
+                            return true;
+                        }
+                    }                    
+
                     continue;
                 }
 

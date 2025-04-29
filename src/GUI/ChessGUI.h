@@ -21,7 +21,7 @@ class ChessGUI
   private:
     game::Game *m_Game;
     
-    bool m_SwapBoardViewOnMove = true;
+    bool m_FlipBoardOnMove = true;
     bool m_IsNormalBoardView = true;
 
     float m_SquareSize = 64.0f;
