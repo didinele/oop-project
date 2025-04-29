@@ -4,7 +4,7 @@
 #include "../Move.h"
 #include <vector>
 
-#define Board std::array<std::array<std::optional<Piece *>, 8>, 8>
+#define Board std::array<std::array<std::optional<game::Piece *>, 8>, 8>
 #define BOARD_AT(coords) board[coords.GetRank()][coords.GetFile()]
 
 namespace game
@@ -52,4 +52,5 @@ class Piece
 };
 
 Board CloneBoard(Board &board);
+void FreeBoard(Board &board);
 } // namespace game

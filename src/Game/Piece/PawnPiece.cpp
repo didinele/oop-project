@@ -140,6 +140,6 @@ void PawnPiece::MakeMove(Board &board, Move move, bool simulate)
 
 Piece *PawnPiece::Clone() const
 {
-    return new PawnPiece(m_Color, m_Coordinates);
+    return new PawnPiece(*this);
 }
 } // namespace game

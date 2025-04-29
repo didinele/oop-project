@@ -111,7 +111,9 @@ bool Game::MakeMove(Move move)
                         return false;
                     }
                 }
-            } else {
+            }
+            else
+            {
                 auto found = dynamic_cast<KingPiece *>(piece);
                 if (found != nullptr)
                 {
@@ -121,9 +123,9 @@ bool Game::MakeMove(Move move)
         }
     }
 
+    FreeBoard(m_Board);
     m_Board = clone;
-    operator[](move.from) = std::nullopt;
-    operator[](move.to) = piece->Clone();
+
     m_State = king->mated || enemy_king->mated ? GameState::Ended : GameState::Waiting;
     m_CurrentPlayer = m_CurrentPlayer == Color::White ? Color::Black : Color::White;
 

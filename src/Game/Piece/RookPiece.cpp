@@ -30,6 +30,6 @@ void RookPiece::MakeMove(Board &board, Move move, bool simulate)
 }
 Piece *RookPiece::Clone() const
 {
-    return new RookPiece(m_Color, m_Coordinates, m_Kind);
+    return new RookPiece(*this);
 }
 } // namespace game

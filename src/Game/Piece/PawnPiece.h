@@ -18,5 +18,11 @@ class PawnPiece : public Piece
 
   private:
     bool m_Moved = false;
+
+    // Used for cloning
+    PawnPiece(const PawnPiece &other) : Piece(other)
+    {
+        m_Moved = other.m_Moved;
+    }
 };
 } // namespace game

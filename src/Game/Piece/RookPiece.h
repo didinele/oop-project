@@ -33,6 +33,13 @@ class RookPiece : public Piece
   private:
     RookKind m_Kind;
 
+    // Used for cloning
+    RookPiece(const RookPiece &other) : Piece(other)
+    {
+        moved = other.moved;
+        m_Kind = other.m_Kind;
+    }
+
     void MakeMove(Board &board, Move move, bool simulate) override;
 };
 } // namespace game

@@ -18,6 +18,12 @@ class KingPiece : public Piece
     [[nodiscard]] bool IsInCheck(Board &board) const;
 
   private:
+    // Used for cloning
+    KingPiece(const KingPiece &other) : Piece(other)
+    {
+        m_HasMoved = other.m_HasMoved;
+    }
+
     bool m_HasMoved = false;
 
     [[nodiscard]] bool CanCastleShort(Board &board) const;

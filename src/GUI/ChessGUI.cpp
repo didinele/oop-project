@@ -9,6 +9,7 @@
 #include "../Game/Piece/QueenPiece.h"
 #include "../Game/Piece/RookPiece.h"
 #include "../Util/Debug.h"
+#include "imgui.h"
 #include "ChessGUI.h"
 #include <algorithm>
 #include <iostream>
@@ -94,9 +95,24 @@ void ChessGUI::Render()
 
     ImGui::Begin("Chess Game", nullptr, window_flags);
 
-#ifndef NDEBUG
     if (ImGui::BeginMainMenuBar())
     {
+#ifndef NDEBUG
+        if (ImGui::BeginMenu("View"))
+        {
+            if (ImGui::MenuItem("Swap Board View"))
+            {
+                m_IsNormalBoardView = !m_IsNormalBoardView;
+            }
+
+            if (ImGui::Checkbox("Swap Board View on Move", &m_SwapBoardViewOnMove))
+            {
+                // no-op
+            }
+
+            ImGui::EndMenu();
+        }
+
         if (ImGui::BeginMenu("Debug"))
         {
             bool debug_enabled = util::Debugger::IsDebugEnabled();
@@ -107,9 +123,9 @@ void ChessGUI::Render()
 
             ImGui::EndMenu();
         }
+#endif
         ImGui::EndMainMenuBar();
     }
-#endif
 
     auto turn = (m_Game->GetCurrentPlayer() == game::Color::White) ? "White" : "Black";
 
@@ -242,10 +258,10 @@ void ChessGUI::DrawPieces(ImDrawList &drawList)
                 if (col != -1 && row != -1)
                 {
                     // Calculate coordinates
-                    float u0 = (col * piece_tex_width) / m_TextureWidth;
-                    float v0 = (row * piece_tex_height) / m_TextureHeight;
-                    float u1 = ((col + 1) * piece_tex_width) / m_TextureWidth;
-                    float v1 = ((row + 1) * piece_tex_height) / m_TextureHeight;
+                    auto u0 = (col * piece_tex_width) / m_TextureWidth;
+                    auto v0 = (row * piece_tex_height) / m_TextureHeight;
+                    auto u1 = ((col + 1) * piece_tex_width) / m_TextureWidth;
+                    auto v1 = ((row + 1) * piece_tex_height) / m_TextureHeight;
 
                     // Get screen position for the square
                     ImVec2 p_min = GetScreenPos(coords);
@@ -320,6 +336,12 @@ void ChessGUI::HandleInput()
                 auto move_made = m_Game->MakeMove(move_to_make);
                 scope.Debug("Move made: %s\n", move_made ? "true" : "false");
 
+                if (move_made && m_SwapBoardViewOnMove)
+                {
+                    m_IsNormalBoardView = m_Game->GetCurrentPlayer() == game::Color::White;
+                    scope.Debug("Swapped board view\n");
+                }
+
                 // Deselect regardless of outcome
                 m_SelectedSquare = std::nullopt;
                 m_PossibleMovesForSelected.clear();
@@ -390,20 +412,30 @@ void ChessGUI::HandleInput()
 
 ImVec2 ChessGUI::GetScreenPos(game::Coordinates coords) const
 {
-    auto x = m_BoardStartX + coords.GetFile() * m_SquareSize;
-    auto y = m_BoardStartY + (7 - coords.GetRank()) * m_SquareSize;
-    return ImVec2(x, y);
+    if (m_IsNormalBoardView)
+    {
+
+        auto x = m_BoardStartX + coords.GetFile() * m_SquareSize;
+        auto y = m_BoardStartY + (7 - coords.GetRank()) * m_SquareSize;
+        return ImVec2(x, y);
+    }
+    else
+    {
+        auto x = m_BoardStartX + coords.GetFile() * m_SquareSize;
+        auto y = m_BoardStartY + coords.GetRank() * m_SquareSize;
+        return ImVec2(x, y);
+    }
 }
 
 std::optional<game::Coordinates> ChessGUI::GetCoordsFromScreenPos(ImVec2 pos) const
 {
-    // Calculate potential board indices based on mouse position relative to board top-left
-    float relative_x = pos.x - m_BoardStartX;
-    float relative_y = pos.y - m_BoardStartY;
-
     // Calculate total board dimensions
-    float board_pixel_width = 8.0f * m_SquareSize;
-    float board_pixel_height = 8.0f * m_SquareSize;
+    auto board_pixel_width = 8.0f * m_SquareSize;
+    auto board_pixel_height = 8.0f * m_SquareSize;
+
+    // Calculate potential board indices based on mouse position relative to board top-left
+    auto relative_x = pos.x - m_BoardStartX;
+    auto relative_y = pos.y - m_BoardStartY;
 
     // Check if the click is within the board's pixel boundaries
     if (relative_x < 0 || relative_x >= board_pixel_width || relative_y < 0 ||
@@ -413,7 +445,14 @@ std::optional<game::Coordinates> ChessGUI::GetCoordsFromScreenPos(ImVec2 pos) co
     }
 
     int file = std::min(7, std::max(0, static_cast<int>(relative_x / m_SquareSize)));
-    int rank = std::min(7, std::max(0, 7 - static_cast<int>(relative_y / m_SquareSize)));
+    int rank = std::min(
+        7,
+        std::max(
+            0,
+            m_IsNormalBoardView ? 7 - static_cast<int>(relative_y / m_SquareSize)
+                                : static_cast<int>(relative_y / m_SquareSize)
+        )
+    );
     return game::Coordinates(rank, file);
 }
 } // namespace gui

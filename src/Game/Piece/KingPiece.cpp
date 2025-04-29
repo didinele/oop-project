@@ -334,6 +334,6 @@ void KingPiece::MakeMove(Board &board, Move move, bool simulate)
 }
 Piece *KingPiece::Clone() const
 {
-    return new KingPiece(m_Color, m_Coordinates);
+    return new KingPiece(*this);
 }
 } // namespace game

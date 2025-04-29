@@ -286,4 +286,20 @@ Board CloneBoard(Board &board)
     }
     return clone;
 }
+
+void FreeBoard(Board &board)
+{
+    for (auto rank = 0; rank < 8; rank++)
+    {
+        for (auto file = 0; file < 8; file++)
+        {
+            auto option = board[rank][file];
+            if (option.has_value())
+            {
+                delete option.value();
+                board[rank][file] = std::nullopt;
+            }
+        }
+    }
+}
 } // namespace game
