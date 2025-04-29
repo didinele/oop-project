@@ -1,5 +1,4 @@
 // TODO: Highlights should be on top of pieces
-// TODO: Resignations
 
 // No idea how this header is written, but if its not our first include, we aren't compiling
 #include <OpenGL/gl3.h>
@@ -102,6 +101,14 @@ void ChessGUI::Render()
     {
         if (ImGui::BeginMenu("Game"))
         {
+            if (ImGui::MenuItem("Resign"))
+            {
+                m_Game->Resign();
+                m_DrawProposed = false;
+                m_SelectedSquare = std::nullopt;
+                m_PossibleMovesForSelected.clear();
+            }
+
             if (m_DrawProposed)
             {
                 if (m_DrawProposedFor == m_Game->GetCurrentPlayer())
@@ -111,6 +118,8 @@ void ChessGUI::Render()
                     {
                         m_Game->Draw();
                         m_DrawProposed = false;
+                        m_SelectedSquare = std::nullopt;
+                        m_PossibleMovesForSelected.clear();
                     }
                     if (ImGui::MenuItem("Decline Draw"))
                     {
@@ -172,7 +181,8 @@ void ChessGUI::Render()
             break;
         }
         case game::GameState::Ended: {
-            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s lost by checkmate", turn);
+            auto opposite = (m_Game->GetCurrentPlayer() == game::Color::White) ? "Black" : "White";
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s won", opposite);
             break;
         }
         case game::GameState::Draw: {

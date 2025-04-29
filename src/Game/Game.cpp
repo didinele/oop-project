@@ -76,6 +76,11 @@ Board Game::GetBoard() const
     return m_Board;
 }
 
+void Game::Resign()
+{
+    this->m_State = GameState::Ended;
+}
+
 void Game::Draw()
 {
     this->m_State = GameState::Draw;

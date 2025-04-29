@@ -18,6 +18,7 @@ class Game
     [[nodiscard]] GameState GetState() const;
     [[nodiscard]] Board GetBoard() const;
 
+    void Resign();
     void Draw();
 
     // Mostly delegates to <Piece>.MakeMove(), but adds some extra checks and maintains
