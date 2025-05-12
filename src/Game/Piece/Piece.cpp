@@ -27,7 +27,6 @@ Color Piece::GetColor() const
 {
     return m_Color;
 }
-// TODO: Fix bug where pawn up counts as being "seen by"
 std::vector<Piece *> Piece::GetSeenBy(Board &board) const
 {
     std::vector<Piece *> out;
@@ -51,6 +50,12 @@ std::vector<Piece *> Piece::GetSeenBy(Board &board) const
             auto moves = piece->GetPossibleMoves(board);
             for (auto &move : moves)
             {
+                // Edge case with pawns preventing certain things by "seeing" above them
+                if (dynamic_cast<PawnPiece *>(piece) != nullptr && move.to.GetRank() == m_Coordinates.GetRank())
+                {
+                    continue;
+                }
+
                 if (move.to == m_Coordinates)
                 {
                     out.push_back(piece);
