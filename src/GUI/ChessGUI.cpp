@@ -213,7 +213,15 @@ void ChessGUI::Render()
         ImGui::TextColored(ImVec4(1, 0, 0, 1), "Error: Piece textures not loaded!");
     }
 
-    HandleInput();
+    // Draw promotion dialog if active, otherwise handle input normally
+    if (m_PromotionDialogActive)
+    {
+        DrawPromotionDialog();
+    }
+    else
+    {
+        HandleInput();
+    }
 
     ImGui::End();
 }
@@ -344,7 +352,8 @@ void ChessGUI::HandleInput()
         is_mouse_over_board = true;
     }
 
-    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && is_mouse_over_board)
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && is_mouse_over_board &&
+        !m_PromotionDialogActive)
     {
         auto clicked_coords = coords_option.value();
         auto clicked_square_option = m_Game->operator[](clicked_coords);
@@ -358,13 +367,20 @@ void ChessGUI::HandleInput()
             {
                 if (possible_move.to == clicked_coords)
                 {
-                    // TODO: Handle promotions - requires UI interaction
-                    // if (possibleMove.promotionKind.has_value()) {
-                    //     // Need to pop up a dialog/widget to ask user for piece type
-                    //     // Update moveToMake.promotionKind based on user choice
-                    // }
                     move_to_make = possible_move;
                     is_move_target = true;
+
+                    if (possible_move.promotionKind.has_value())
+                    {
+                        // Don't make the move immediately, activate promotion dialog instead
+                        m_PromotionDialogActive = true;
+                        m_PendingPromotionMove =
+                            game::Move(m_SelectedSquare.value(), clicked_coords);
+
+                        scope.Debug("Promotion move detected, showing dialog\n");
+                        return;
+                    }
+
                     break;
                 }
             }
@@ -467,6 +483,105 @@ void ChessGUI::HandleInput()
     }
 }
 
+void ChessGUI::DrawPromotionDialog()
+{
+    ImGui::SetNextWindowPos(
+        ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f),
+        ImGuiCond_Always,
+        ImVec2(0.5f, 0.5f)
+    );
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize;
+
+    if (ImGui::Begin("Promote Pawn", &m_PromotionDialogActive, flags))
+    {
+        ImGui::Text("Choose a piece for promotion:");
+
+        const char *promotion_options[] = {"Queen", "Rook", "Bishop", "Knight"};
+        // Default to Queen
+        static int current_promotion = 0;
+
+        ImGui::ListBox(
+            "##PromotionSelection",
+            &current_promotion,
+            promotion_options,
+            IM_ARRAYSIZE(promotion_options),
+            4
+        );
+
+        if (ImGui::Button("Confirm", ImVec2(120, 0)))
+        {
+            // Apply the selected promotion
+            game::PromotionKind promotion_kind;
+
+            switch (current_promotion)
+            {
+                case 0: {
+                    promotion_kind = game::PromotionKind::Queen;
+                    break;
+                }
+                case 1: {
+                    promotion_kind = game::PromotionKind::Rook;
+                    break;
+                }
+                case 2: {
+                    promotion_kind = game::PromotionKind::Bishop;
+                    break;
+                }
+                case 3: {
+                    promotion_kind = game::PromotionKind::Knight;
+                    break;
+                }
+                default: {
+                    promotion_kind = game::PromotionKind::Queen;
+                    break;
+                }
+            }
+
+            // Update the pending move with the chosen promotion kind
+            game::Move move(m_PendingPromotionMove.from, m_PendingPromotionMove.to, promotion_kind);
+
+            // TODO: This stuff should be de-duped with handle input
+
+            // Complete the move
+            auto move_made = m_Game->MakeMove(move);
+            if (move_made)
+            {
+                // Note the inverted check, since at this point GetCurrentPlayer is flipped
+                if (m_DrawProposed && m_DrawProposedFor != m_Game->GetCurrentPlayer())
+                {
+                    // Implicitly rejected
+                    m_DrawProposed = false;
+                }
+
+                if (m_FlipBoardOnMove)
+                {
+                    m_IsNormalBoardView = m_Game->GetCurrentPlayer() == game::Color::White;
+                }
+            }
+
+            // Close dialog and reset selection
+            m_PromotionDialogActive = false;
+            current_promotion = 0;
+
+            // Clear selection
+            m_SelectedSquare = std::nullopt;
+            m_PossibleMovesForSelected.clear();
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel", ImVec2(120, 0)))
+        {
+            m_PromotionDialogActive = false;
+            current_promotion = 0;
+        }
+    }
+
+    ImGui::End();
+}
+
 ImVec2 ChessGUI::GetScreenPos(game::Coordinates coords) const
 {
     if (m_IsNormalBoardView)
@@ -501,8 +616,8 @@ std::optional<game::Coordinates> ChessGUI::GetCoordsFromScreenPos(ImVec2 pos) co
         return std::nullopt;
     }
 
-    int file = std::min(7, std::max(0, static_cast<int>(relative_x / m_SquareSize)));
-    int rank = std::min(
+    auto file = std::min(7, std::max(0, static_cast<int>(relative_x / m_SquareSize)));
+    auto rank = std::min(
         7,
         std::max(
             0,
@@ -510,6 +625,7 @@ std::optional<game::Coordinates> ChessGUI::GetCoordsFromScreenPos(ImVec2 pos) co
                                 : static_cast<int>(relative_y / m_SquareSize)
         )
     );
+
     return game::Coordinates(rank, file);
 }
 } // namespace gui

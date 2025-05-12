@@ -26,6 +26,10 @@ class ChessGUI
     
     bool m_FlipBoardOnMove = true;
     bool m_IsNormalBoardView = true;
+    
+    // Promotion UI
+    bool m_PromotionDialogActive = false;
+    game::Move m_PendingPromotionMove = game::Move(game::Coordinates(0, 0), game::Coordinates(0, 0));
 
     float m_SquareSize = 64.0f;
     float m_BoardStartX = 50.0f;
@@ -49,6 +53,7 @@ class ChessGUI
     // Drawing helpers
     void DrawBoard(ImDrawList &draw_list);
     void DrawPieces(ImDrawList &draw_list);
+    void DrawPromotionDialog();
 
     // Input handling
     void HandleInput();
