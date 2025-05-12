@@ -328,8 +328,6 @@ bool KingPiece::CanCastleLong(Board &board) const
             auto option = board[rank][file];
             if (option.has_value() && option.value()->GetColor() != m_Color)
             {
-                auto moves = option.value()->GetPossibleMoves(board);
-
                 // (white) KingPiece::GetPossibleMoves() -> KingPiece::CanCastleLong() ->
                 // (black) KingPiece::GetPossibleMoves() is a fatal stack overflow infinite
                 // recursion. Easiest fix is to just check if the piece is a king
@@ -337,6 +335,8 @@ bool KingPiece::CanCastleLong(Board &board) const
                 {
                     continue;
                 }
+
+                auto moves = option.value()->GetPossibleMoves(board);
 
                 for (auto &move : moves)
                 {
