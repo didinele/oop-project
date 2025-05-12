@@ -1,5 +1,3 @@
-// TODO: Highlights should be on top of pieces
-
 // No idea how this header is written, but if its not our first include, we aren't compiling
 #include <OpenGL/gl3.h>
 
@@ -207,6 +205,8 @@ void ChessGUI::Render()
     if (m_PiecesTextureID != 0)
     {
         DrawPieces(*draw_list);
+        // Draw highlights after pieces so they're visible on top
+        DrawHighlights(*draw_list);
     }
     else
     {
@@ -240,26 +240,6 @@ void ChessGUI::DrawBoard(ImDrawList &draw_list)
             ImVec2 p_max = ImVec2(p_min.x + m_SquareSize, p_min.y + m_SquareSize);
 
             draw_list.AddRectFilled(p_min, p_max, ImGui::ColorConvertFloat4ToU32(square_color));
-
-            if (m_SelectedSquare.has_value() && m_SelectedSquare.value() == coords)
-            {
-                draw_list
-                    .AddRectFilled(p_min, p_max, ImGui::ColorConvertFloat4ToU32(m_HighlightColor));
-            }
-        }
-    }
-
-    if (m_SelectedSquare.has_value())
-    {
-        for (auto &move : m_PossibleMovesForSelected)
-        {
-            ImVec2 p_min = GetScreenPos(move.to);
-            // Draw a circle or different highlight for possible moves
-            draw_list.AddCircleFilled(
-                ImVec2(p_min.x + m_SquareSize * 0.5f, p_min.y + m_SquareSize * 0.5f),
-                m_SquareSize * 0.2f, // Smaller radius for move indicators
-                ImGui::ColorConvertFloat4ToU32(m_HighlightColor)
-            );
         }
     }
 }
@@ -324,6 +304,31 @@ void ChessGUI::DrawPieces(ImDrawList &drawList)
                         .AddImage(m_PiecesTextureID, p_min, p_max, ImVec2(u0, v0), ImVec2(u1, v1));
                 }
             }
+        }
+    }
+}
+
+void gui::ChessGUI::DrawHighlights(ImDrawList &draw_list)
+{
+    // Draw highlight for selected square
+    if (m_SelectedSquare.has_value())
+    {
+        game::Coordinates coords = m_SelectedSquare.value();
+        ImVec2 p_min = GetScreenPos(coords);
+        ImVec2 p_max = ImVec2(p_min.x + m_SquareSize, p_min.y + m_SquareSize);
+        
+        draw_list.AddRectFilled(p_min, p_max, ImGui::ColorConvertFloat4ToU32(m_HighlightColor));
+        
+        // Draw highlights for possible moves
+        for (auto &move : m_PossibleMovesForSelected)
+        {
+            ImVec2 move_p_min = GetScreenPos(move.to);
+            // Draw a circle for possible moves
+            draw_list.AddCircleFilled(
+                ImVec2(move_p_min.x + m_SquareSize * 0.5f, move_p_min.y + m_SquareSize * 0.5f),
+                m_SquareSize * 0.2f,
+                ImGui::ColorConvertFloat4ToU32(m_HighlightColor)
+            );
         }
     }
 }
@@ -526,7 +531,7 @@ void ChessGUI::DrawPromotionDialog()
             // Complete the move
             auto move_made = m_Game->MakeMove(move);
             HandleMoveAftermath(move_made);
-            
+
             m_PromotionDialogActive = false;
             current_promotion = 0;
         }

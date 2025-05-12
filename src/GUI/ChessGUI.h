@@ -53,6 +53,7 @@ class ChessGUI
     // Drawing helpers
     void DrawBoard(ImDrawList &draw_list);
     void DrawPieces(ImDrawList &draw_list);
+    void DrawHighlights(ImDrawList &draw_list);
     void DrawPromotionDialog();
 
     // Input handling
