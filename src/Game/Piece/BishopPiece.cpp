@@ -3,6 +3,10 @@
 
 namespace game
 {
+BishopPiece::BishopPiece(Color color, Coordinates coords) : Piece(color, coords)
+{
+}
+
 std::vector<Move> BishopPiece::GetPossibleMoves(Board &board) const
 {
     return GetNaiveMovesInDirections(

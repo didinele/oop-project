@@ -156,7 +156,7 @@ void Piece::MakeMove(Board &board, Move move, bool simulate)
                 auto pawn = dynamic_cast<PawnPiece *>(piece);
                 if (pawn != nullptr)
                 {
-                    pawn->enPassantMoves = std::vector<Move>();
+                    pawn->SetEnPassantMoves(std::vector<Move>());
                 }
             }
 
@@ -225,7 +225,7 @@ void Piece::MakeMove(Board &board, Move move, bool simulate)
         if (!can_escape)
         {
             scope.Debug("King is mated\n");
-            enemy_king->mated = true;
+            enemy_king->SetMated();
         }
     }
 }

@@ -52,24 +52,24 @@ int main(int, char **)
     // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
 
-    GLFWwindow *window =
-        glfwCreateWindow(1280, 720, "Chess Game", nullptr, nullptr);
-    if (window == nullptr) {
+    GLFWwindow *window = glfwCreateWindow(1280, 720, "Chess Game", nullptr, nullptr);
+    if (window == nullptr)
+    {
         fprintf(stderr, "Failed to create GLFW window.\n");
         return 1;
     }
 
     glfwMakeContextCurrent(window);
     // Enable vsync
-    glfwSwapInterval(1); 
+    glfwSwapInterval(1);
 
     // Setup ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
+    auto &io = ImGui::GetIO();
     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; 
-    
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
     ImGui::StyleColorsDark();
 
     // Setup Platform/Renderer backends
@@ -80,7 +80,7 @@ int main(int, char **)
     gui::ChessGUI chess_gui(&game);
 
     // Background color (dark grey)
-    ImVec4 clear_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f); 
+    auto clear_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 
     while (!glfwWindowShouldClose(window))
     {

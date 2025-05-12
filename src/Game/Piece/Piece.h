@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Common.h"
+#include "../Coordinates.h"
 #include "../Move.h"
 #include <vector>
 

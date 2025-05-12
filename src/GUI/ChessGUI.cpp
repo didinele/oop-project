@@ -20,47 +20,6 @@
 
 namespace gui
 {
-bool ChessGUI::LoadPiecesTexture(const char *filename)
-{
-    int width, height, channels_in_file;
-    auto data = stbi_load(filename, &width, &height, &channels_in_file, 4);
-    if (!data)
-    {
-        std::cerr << "Error loading texture: " << filename << " Reason: " << stbi_failure_reason()
-                  << std::endl;
-        return false;
-    }
-
-    m_TextureWidth = width;
-    m_TextureHeight = height;
-
-    glGenTextures(1, &m_PiecesTextureID);
-    glBindTexture(GL_TEXTURE_2D, m_PiecesTextureID);
-
-    // Set texture parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    // Upload texture data
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-    // Free image data
-    stbi_image_free(data);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    util::Debugger::Debug(
-        "Loaded texture: %s (%d x %d, %d channels in file, loaded as RGBA)\n",
-        filename,
-        width,
-        height,
-        channels_in_file
-    );
-
-    return m_PiecesTextureID != 0;
-}
-
 ChessGUI::ChessGUI(game::Game *game) : m_Game(game)
 {
     if (!LoadPiecesTexture("resources/textures/chess_pieces.png"))
@@ -316,9 +275,9 @@ void gui::ChessGUI::DrawHighlights(ImDrawList &draw_list)
         game::Coordinates coords = m_SelectedSquare.value();
         ImVec2 p_min = GetScreenPos(coords);
         ImVec2 p_max = ImVec2(p_min.x + m_SquareSize, p_min.y + m_SquareSize);
-        
+
         draw_list.AddRectFilled(p_min, p_max, ImGui::ColorConvertFloat4ToU32(m_HighlightColor));
-        
+
         // Draw highlights for possible moves
         for (auto &move : m_PossibleMovesForSelected)
         {
@@ -598,7 +557,7 @@ std::optional<game::Coordinates> ChessGUI::GetCoordsFromScreenPos(ImVec2 pos) co
 void ChessGUI::HandleMoveAftermath(bool move_made)
 {
     auto scope = util::Debugger::CreateScope("ChessGUI::HandleMoveAftermath");
-    
+
     if (move_made)
     {
         // Note the inverted check, since at this point GetCurrentPlayer is flipped
@@ -619,5 +578,46 @@ void ChessGUI::HandleMoveAftermath(bool move_made)
     // Deselect regardless of outcome
     m_SelectedSquare = std::nullopt;
     m_PossibleMovesForSelected.clear();
+}
+
+bool ChessGUI::LoadPiecesTexture(const char *filename)
+{
+    int width, height, channels_in_file;
+    auto data = stbi_load(filename, &width, &height, &channels_in_file, 4);
+    if (!data)
+    {
+        std::cerr << "Error loading texture: " << filename << " Reason: " << stbi_failure_reason()
+                  << std::endl;
+        return false;
+    }
+
+    m_TextureWidth = width;
+    m_TextureHeight = height;
+
+    glGenTextures(1, &m_PiecesTextureID);
+    glBindTexture(GL_TEXTURE_2D, m_PiecesTextureID);
+
+    // Set texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // Upload texture data
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+    // Free image data
+    stbi_image_free(data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    util::Debugger::Debug(
+        "Loaded texture: %s (%d x %d, %d channels in file, loaded as RGBA)\n",
+        filename,
+        width,
+        height,
+        channels_in_file
+    );
+
+    return m_PiecesTextureID != 0;
 }
 } // namespace gui

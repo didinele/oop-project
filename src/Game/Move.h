@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Common.h"
-#include <vector>
+#include "Coordinates.h"
 #include <optional>
+#include <vector>
 
 namespace game
 {

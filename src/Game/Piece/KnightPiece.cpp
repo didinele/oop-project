@@ -3,6 +3,10 @@
 
 namespace game
 {
+KnightPiece::KnightPiece(Color color, Coordinates coords) : Piece(color, coords)
+{
+}
+
 std::vector<Move> KnightPiece::GetPossibleMoves(Board &board) const
 {
     std::vector<Move> moves;
@@ -39,6 +43,7 @@ std::vector<Move> KnightPiece::GetPossibleMoves(Board &board) const
 
     return moves;
 }
+
 Piece *KnightPiece::Clone() const
 {
     return new KnightPiece(m_Color, m_Coordinates);

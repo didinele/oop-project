@@ -21,16 +21,20 @@ class ChessGUI
   private:
     game::Game *m_Game;
 
+    // Draws
     bool m_DrawProposed = false;
     game::Color m_DrawProposedFor = game::Color::White;
-    
+
+    // Board flipping
     bool m_FlipBoardOnMove = true;
     bool m_IsNormalBoardView = true;
-    
+
     // Promotion UI
     bool m_PromotionDialogActive = false;
-    game::Move m_PendingPromotionMove = game::Move(game::Coordinates(0, 0), game::Coordinates(0, 0));
+    game::Move m_PendingPromotionMove =
+        game::Move(game::Coordinates(0, 0), game::Coordinates(0, 0));
 
+    // UI stuff
     float m_SquareSize = 64.0f;
     float m_BoardStartX = 50.0f;
     float m_BoardStartY = 50.0f;
@@ -41,7 +45,7 @@ class ChessGUI
     // Yellow highlight
     ImVec4 m_HighlightColor = ImVec4(1.0f, 1.0f, 0.0f, 0.4f);
 
-    // Game state interaction
+    // Game state interaction state
     std::optional<game::Coordinates> m_SelectedSquare = std::nullopt;
     std::vector<game::Move> m_PossibleMovesForSelected;
 
@@ -58,7 +62,7 @@ class ChessGUI
 
     // Input handling
     void HandleInput();
-    
+
     // Common move processing
     void HandleMoveAftermath(bool move_made);
 

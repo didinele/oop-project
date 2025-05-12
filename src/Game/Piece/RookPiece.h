@@ -15,30 +15,19 @@ enum class RookKind
 class RookPiece : public Piece
 {
   public:
-    RookPiece(Color color, Coordinates coords)
-        : Piece(color, coords), moved(true), m_Kind(RookKind::Noop)
-    {
-    }
-    RookPiece(Color color, Coordinates coords, RookKind kind)
-        : Piece(color, coords), moved(false), m_Kind(kind)
-    {
-    }
+    RookPiece(Color color, Coordinates coords);
+    RookPiece(Color color, Coordinates coords, RookKind kind);
     [[nodiscard]] std::vector<Move> GetPossibleMoves(Board &board) const override;
     [[nodiscard]] virtual Piece *Clone() const override;
 
-    bool moved;
-
     [[nodiscard]] RookKind GetKind() const;
+
+    [[nodiscard]] bool GetHasMoved() const;
+    void SetMoved();
 
   private:
     RookKind m_Kind;
-
-    // Used for cloning
-    RookPiece(const RookPiece &other) : Piece(other)
-    {
-        moved = other.moved;
-        m_Kind = other.m_Kind;
-    }
+    bool m_Moved;
 
     void MakeMove(Board &board, Move move, bool simulate) override;
 };

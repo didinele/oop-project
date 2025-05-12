@@ -38,7 +38,7 @@ add_executable(
     src/Game/Piece/QueenPiece.cpp
     src/Game/Piece/RookPiece.cpp
 
-    src/Game/Common.cpp
+    src/Game/Coordinates.cpp
     src/Game/Game.cpp
     src/Game/Move.cpp
 

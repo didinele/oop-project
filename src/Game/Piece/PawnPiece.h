@@ -7,22 +7,16 @@ namespace game
 class PawnPiece : public Piece
 {
   public:
-    PawnPiece(Color color, Coordinates coords) : Piece(color, coords)
-    {
-    }
+    PawnPiece(Color color, Coordinates coords);
     [[nodiscard]] std::vector<Move> GetPossibleMoves(Board &board) const override;
     [[nodiscard]] virtual Piece *Clone() const override;
-    std::vector<Move> enPassantMoves;
 
     void MakeMove(Board &board, Move move, bool simulate) override;
 
+    void SetEnPassantMoves(std::vector<Move> moves);
+
   private:
     bool m_Moved = false;
-
-    // Used for cloning
-    PawnPiece(const PawnPiece &other) : Piece(other)
-    {
-        m_Moved = other.m_Moved;
-    }
+    std::vector<Move> m_EnPassantMoves;
 };
 } // namespace game

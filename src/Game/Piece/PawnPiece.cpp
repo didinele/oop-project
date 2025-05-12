@@ -1,17 +1,22 @@
 #include "PawnPiece.h"
 #include "../../Util/Debug.h"
+#include <vector>
 
 // For all intents and purposes, "up" can mean down for black.
 
 namespace game
 {
+PawnPiece::PawnPiece(Color color, Coordinates coords) : Piece(color, coords)
+{
+}
+
 std::vector<Move> PawnPiece::GetPossibleMoves(Board &board) const
 {
     std::vector<Move> out;
 
-    if (enPassantMoves.size())
+    if (m_EnPassantMoves.size())
     {
-        for (auto move : enPassantMoves)
+        for (auto move : m_EnPassantMoves)
         {
             out.push_back(move);
         }
@@ -84,6 +89,15 @@ std::vector<Move> PawnPiece::GetPossibleMoves(Board &board) const
     return out;
 }
 
+Piece *PawnPiece::Clone() const
+{
+    auto other = new PawnPiece(m_Color, m_Coordinates);
+    other->m_Moved = m_Moved;
+    other->m_EnPassantMoves = m_EnPassantMoves;
+
+    return other;
+}
+
 void PawnPiece::MakeMove(Board &board, Move move, bool simulate)
 {
     Piece::MakeMove(board, move, simulate);
@@ -116,7 +130,7 @@ void PawnPiece::MakeMove(Board &board, Move move, bool simulate)
                     to.GetRank(),
                     to.GetFile()
                 );
-                pawn->enPassantMoves.push_back(Move(pawn->m_Coordinates, to, m_Coordinates));
+                pawn->m_EnPassantMoves.push_back(Move(pawn->m_Coordinates, to, m_Coordinates));
             }
         }
 
@@ -132,14 +146,14 @@ void PawnPiece::MakeMove(Board &board, Move move, bool simulate)
                     to.GetRank(),
                     to.GetFile()
                 );
-                pawn->enPassantMoves.push_back(Move(pawn->m_Coordinates, to, m_Coordinates));
+                pawn->m_EnPassantMoves.push_back(Move(pawn->m_Coordinates, to, m_Coordinates));
             }
         }
     }
 }
 
-Piece *PawnPiece::Clone() const
+void PawnPiece::SetEnPassantMoves(std::vector<Move> moves)
 {
-    return new PawnPiece(*this);
+    m_EnPassantMoves = moves;
 }
 } // namespace game

@@ -8,6 +8,10 @@ static short offsets[8][2] = {{1, 0}, {1, 1}, {1, -1}, {-1, 0}, {-1, 1}, {-1, -1
 
 namespace game
 {
+KingPiece::KingPiece(Color color, Coordinates coords) : Piece(color, coords)
+{
+}
+
 std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
 {
     std::vector<Move> out;
@@ -44,9 +48,10 @@ std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
         auto piece = BOARD_AT(to);
         if (piece.has_value())
         {
-            // In the past, we checked `piece.value()->GetSeenBy(board).empty()`. That is infinitely recursive
-            // (GetSeenBy calls GetPossibleMoves for all pieces, including this very one). Let's just compromise and not
-            // check. Game will undo the move anyways if it puts the king into check.
+            // In the past, we checked `piece.value()->GetSeenBy(board).empty()`. That is infinitely
+            // recursive (GetSeenBy calls GetPossibleMoves for all pieces, including this very one).
+            // Let's just compromise and not check. Game will undo the move anyways if it puts the
+            // king into check.
             if (piece.value()->GetColor() != m_Color)
             {
                 out.push_back(Move(m_Coordinates, to));
@@ -92,6 +97,25 @@ std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
     return out;
 }
 
+Piece *KingPiece::Clone() const
+{
+    auto other = new KingPiece(m_Color, m_Coordinates);
+    other->m_HasMoved = m_HasMoved;
+    other->m_IsMated = m_IsMated;
+
+    return other;
+}
+
+bool KingPiece::GetIsMated() const
+{
+    return m_IsMated;
+}
+
+void KingPiece::SetMated()
+{
+    m_IsMated = true;
+}
+
 bool KingPiece::IsInCheck(Board &board) const
 {
     for (auto rank = 0; rank < 8; rank++)
@@ -104,8 +128,9 @@ bool KingPiece::IsInCheck(Board &board) const
                 // (white) KingPiece::GetPossibleMoves() -> KingPiece::CanCastleShort() ->
                 // KingPiece::IsInCheck() -> (black) KingPiece::GetPossibleMoves() is a fatal stack
                 // overflow infinite recursion. Easiest fix is to just check if the piece is a king
-                // and skip it. Problem is, this skip makes it so kings can end up next to each other.
-                // We account for this by checking if this king we just found is on an adjacent square
+                // and skip it. Problem is, this skip makes it so kings can end up next to each
+                // other. We account for this by checking if this king we just found is on an
+                // adjacent square
                 if (dynamic_cast<KingPiece *>(option.value()) != nullptr)
                 {
                     auto king_coords = option.value()->GetCoordinates();
@@ -121,10 +146,12 @@ bool KingPiece::IsInCheck(Board &board) const
 
                         if (to == m_Coordinates)
                         {
-                            util::Debugger::Debug("[KingPiece::IsInCheck] king is next to enemy king\n");
+                            util::Debugger::Debug(
+                                "[KingPiece::IsInCheck] king is next to enemy king\n"
+                            );
                             return true;
                         }
-                    }                    
+                    }
 
                     continue;
                 }
@@ -168,7 +195,7 @@ bool KingPiece::CanCastleShort(Board &board) const
             auto piece = dynamic_cast<RookPiece *>(option.value());
             if (piece != nullptr && piece->GetKind() == RookKind::Short)
             {
-                if (piece->moved)
+                if (piece->GetHasMoved())
                 {
                     return false;
                 }
@@ -260,7 +287,7 @@ bool KingPiece::CanCastleLong(Board &board) const
             auto piece = dynamic_cast<RookPiece *>(option.value());
             if (piece != nullptr && piece->GetKind() == RookKind::Long)
             {
-                if (piece->moved)
+                if (piece->GetHasMoved())
                 {
                     return false;
                 }
@@ -349,13 +376,9 @@ void KingPiece::MakeMove(Board &board, Move move, bool simulate)
 
         auto new_coords = Coordinates(rook_rank, castle_kind == CastleKind::Short ? 5 : 3);
         rook->SetCoordinates(new_coords);
-        rook->moved = true;
+        rook->SetMoved();
         BOARD_AT(new_coords) = rook;
         board[rook_rank][rook_file] = std::nullopt;
     }
-}
-Piece *KingPiece::Clone() const
-{
-    return new KingPiece(*this);
 }
 } // namespace game

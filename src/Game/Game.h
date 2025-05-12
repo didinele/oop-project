@@ -1,11 +1,21 @@
 #pragma once
 
 #include "./Piece/Piece.h"
-#include "Common.h"
+#include "Coordinates.h"
 #include <optional>
 
 namespace game
 {
+enum class GameState
+{
+    // Waiting for a move
+    Waiting,
+    // Game ended normally (clock/checkmate/resignation)
+    Ended,
+    // Game ended in a draw (note, stalemate checking does not exist. this is manual)
+    Draw,
+};
+
 class Game
 {
   public:

@@ -10,16 +10,6 @@ enum class Color
     Black,
 };
 
-enum class GameState
-{
-    // Waiting for a move
-    Waiting,
-    // Game ended normally (clock/checkmate/resignation)
-    Ended,
-    // Game ended in a draw (note, stalemate checking does not exist. this is manual)
-    Draw,
-};
-
 class Coordinates
 {
   public:
