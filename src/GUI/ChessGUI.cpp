@@ -398,26 +398,7 @@ void ChessGUI::HandleInput()
                 auto move_made = m_Game->MakeMove(move_to_make);
                 scope.Debug("Move made: %s\n", move_made ? "true" : "false");
 
-                if (move_made)
-                {
-                    // Note the inverted check, since at this point GetCurrentPlayer is flipped
-                    if (m_DrawProposed && m_DrawProposedFor != m_Game->GetCurrentPlayer())
-                    {
-                        // Implicitly rejected
-                        scope.Debug("Draw proposal implicitly rejected\n");
-                        m_DrawProposed = false;
-                    }
-
-                    if (m_FlipBoardOnMove)
-                    {
-                        m_IsNormalBoardView = m_Game->GetCurrentPlayer() == game::Color::White;
-                        scope.Debug("Swapped board view\n");
-                    }
-                }
-
-                // Deselect regardless of outcome
-                m_SelectedSquare = std::nullopt;
-                m_PossibleMovesForSelected.clear();
+                HandleMoveAftermath(move_made);
             }
             else
             {
@@ -542,32 +523,12 @@ void ChessGUI::DrawPromotionDialog()
             // Update the pending move with the chosen promotion kind
             game::Move move(m_PendingPromotionMove.from, m_PendingPromotionMove.to, promotion_kind);
 
-            // TODO: This stuff should be de-duped with handle input
-
             // Complete the move
             auto move_made = m_Game->MakeMove(move);
-            if (move_made)
-            {
-                // Note the inverted check, since at this point GetCurrentPlayer is flipped
-                if (m_DrawProposed && m_DrawProposedFor != m_Game->GetCurrentPlayer())
-                {
-                    // Implicitly rejected
-                    m_DrawProposed = false;
-                }
-
-                if (m_FlipBoardOnMove)
-                {
-                    m_IsNormalBoardView = m_Game->GetCurrentPlayer() == game::Color::White;
-                }
-            }
-
-            // Close dialog and reset selection
+            HandleMoveAftermath(move_made);
+            
             m_PromotionDialogActive = false;
             current_promotion = 0;
-
-            // Clear selection
-            m_SelectedSquare = std::nullopt;
-            m_PossibleMovesForSelected.clear();
         }
 
         ImGui::SameLine();
@@ -627,5 +588,31 @@ std::optional<game::Coordinates> ChessGUI::GetCoordsFromScreenPos(ImVec2 pos) co
     );
 
     return game::Coordinates(rank, file);
+}
+
+void ChessGUI::HandleMoveAftermath(bool move_made)
+{
+    auto scope = util::Debugger::CreateScope("ChessGUI::HandleMoveAftermath");
+    
+    if (move_made)
+    {
+        // Note the inverted check, since at this point GetCurrentPlayer is flipped
+        if (m_DrawProposed && m_DrawProposedFor != m_Game->GetCurrentPlayer())
+        {
+            // Implicitly rejected
+            scope.Debug("Draw proposal implicitly rejected\n");
+            m_DrawProposed = false;
+        }
+
+        if (m_FlipBoardOnMove)
+        {
+            m_IsNormalBoardView = m_Game->GetCurrentPlayer() == game::Color::White;
+            scope.Debug("Swapped board view\n");
+        }
+    }
+
+    // Deselect regardless of outcome
+    m_SelectedSquare = std::nullopt;
+    m_PossibleMovesForSelected.clear();
 }
 } // namespace gui

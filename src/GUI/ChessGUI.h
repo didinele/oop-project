@@ -57,6 +57,9 @@ class ChessGUI
 
     // Input handling
     void HandleInput();
+    
+    // Common move processing
+    void HandleMoveAftermath(bool move_made);
 
     // Coordinate conversion helpers
     ImVec2 GetScreenPos(game::Coordinates coords) const;
