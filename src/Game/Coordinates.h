@@ -10,6 +10,7 @@ enum class Color
     Black,
 };
 
+// TODO: + overloads
 class Coordinates
 {
   public:
