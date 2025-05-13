@@ -2,7 +2,7 @@
 
 #include "piece.h"
 
-namespace game
+namespace Game
 {
 class BishopPiece : public Piece
 {
@@ -11,4 +11,4 @@ class BishopPiece : public Piece
     [[nodiscard]] std::vector<Move> GetPossibleMoves(Board &board) const override;
     [[nodiscard]] Piece *Clone() const override;
 };
-} // namespace game
+} // namespace Game

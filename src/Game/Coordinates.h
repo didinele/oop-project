@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace game
+namespace Game
 {
 enum class Color
 {
@@ -31,7 +31,7 @@ class Coordinates
     bool operator!=(const Coordinates &other) const;
 
   private:
-    short m_Rank;
-    short m_File;
+    short m_rank;
+    short m_file;
 };
-} // namespace game
+} // namespace Game

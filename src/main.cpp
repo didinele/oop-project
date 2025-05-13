@@ -1,8 +1,3 @@
-// TODO: m_snake_case class members
-// TODO: PascalCase() methods
-// TODO: _PascalCase() private methods
-// TODO: This_Absurd_Namespace_Style
-
 #include "GUI/chess_gui.h"
 #include "Util/debug.h"
 #include "imgui.h"
@@ -81,8 +76,8 @@ int main(int, char **)
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    game::Game game;
-    gui::ChessGUI chess_gui(&game);
+    Game::Game game;
+    GUI::ChessGUI chess_gui(&game);
 
     // Background color (dark grey)
     auto clear_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
@@ -122,7 +117,7 @@ int main(int, char **)
         glfwSwapBuffers(window);
     }
 
-    util::Debugger::Debug("[main] Main loop broke off; cleaning up and quitting.\n");
+    Util::Debugger::Debug("[main] Main loop broke off; cleaning up and quitting.\n");
 
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();

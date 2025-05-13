@@ -6,7 +6,7 @@
 
 static short offsets[8][2] = {{1, 0}, {1, 1}, {1, -1}, {-1, 0}, {-1, 1}, {-1, -1}, {0, 1}, {0, -1}};
 
-namespace game
+namespace Game
 {
 KingPiece::KingPiece(Color color, Coordinates coords) : Piece(color, coords)
 {
@@ -16,18 +16,18 @@ std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
 {
     std::vector<Move> out;
 
-    if (CanCastleShort(board))
+    if (_CanCastleShort(board))
     {
-        util::Debugger::Debug("[KingPiece::GetPossibleMoves] can castle short\n");
-        auto to = m_Color == Color::White ? Coordinates(0, 6) : Coordinates(7, 6);
-        out.push_back(Move(m_Coordinates, to, CastleKind::Short));
+        Util::Debugger::Debug("[KingPiece::GetPossibleMoves] can castle short\n");
+        auto to = m_color == Color::White ? Coordinates(0, 6) : Coordinates(7, 6);
+        out.push_back(Move(m_coordinates, to, CastleKind::Short));
     }
 
-    if (CanCastleLong(board))
+    if (_CanCastleLong(board))
     {
-        util::Debugger::Debug("[KingPiece::GetPossibleMoves] can castle long\n");
-        auto to = m_Color == Color::White ? Coordinates(0, 2) : Coordinates(7, 2);
-        out.push_back(Move(m_Coordinates, to, CastleKind::Long));
+        Util::Debugger::Debug("[KingPiece::GetPossibleMoves] can castle long\n");
+        auto to = m_color == Color::White ? Coordinates(0, 2) : Coordinates(7, 2);
+        out.push_back(Move(m_coordinates, to, CastleKind::Long));
     }
 
     for (auto &offset : offsets)
@@ -36,8 +36,8 @@ std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
         auto file_offset = offset[1];
 
         auto to = Coordinates(
-            m_Coordinates.GetRank() + rank_offset,
-            m_Coordinates.GetFile() + file_offset
+            m_coordinates.GetRank() + rank_offset,
+            m_coordinates.GetFile() + file_offset
         );
 
         if (!to.IsValid())
@@ -52,9 +52,9 @@ std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
             // recursive (GetSeenBy calls GetPossibleMoves for all pieces, including this very one).
             // Let's just compromise and not check. Game will undo the move anyways if it puts the
             // king into check.
-            if (piece.value()->GetColor() != m_Color)
+            if (piece.value()->GetColor() != m_color)
             {
-                out.push_back(Move(m_Coordinates, to));
+                out.push_back(Move(m_coordinates, to));
             }
         }
         else
@@ -66,7 +66,7 @@ std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
                 for (auto file = 0; file < 8; file++)
                 {
                     auto option = board[rank][file];
-                    if (option.has_value() && option.value()->GetColor() != m_Color)
+                    if (option.has_value() && option.value()->GetColor() != m_color)
                     {
                         // Prevent the classic infinite recursion
                         if (dynamic_cast<KingPiece *>(option.value()) != nullptr)
@@ -89,7 +89,7 @@ std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
 
             if (!seen)
             {
-                out.push_back(Move(m_Coordinates, to));
+                out.push_back(Move(m_coordinates, to));
             }
         }
     }
@@ -99,21 +99,21 @@ std::vector<Move> KingPiece::GetPossibleMoves(Board &board) const
 
 Piece *KingPiece::Clone() const
 {
-    auto other = new KingPiece(m_Color, m_Coordinates);
-    other->m_HasMoved = m_HasMoved;
-    other->m_IsMated = m_IsMated;
+    auto other = new KingPiece(m_color, m_coordinates);
+    other->m_moved = m_moved;
+    other->m_mated = m_mated;
 
     return other;
 }
 
 bool KingPiece::GetIsMated() const
 {
-    return m_IsMated;
+    return m_mated;
 }
 
 void KingPiece::SetMated()
 {
-    m_IsMated = true;
+    m_mated = true;
 }
 
 bool KingPiece::IsInCheck(Board &board) const
@@ -123,7 +123,7 @@ bool KingPiece::IsInCheck(Board &board) const
         for (auto file = 0; file < 8; file++)
         {
             auto option = board[rank][file];
-            if (option.has_value() && option.value()->GetColor() != m_Color)
+            if (option.has_value() && option.value()->GetColor() != m_color)
             {
                 // (white) KingPiece::GetPossibleMoves() -> KingPiece::CanCastleShort() ->
                 // KingPiece::IsInCheck() -> (black) KingPiece::GetPossibleMoves() is a fatal stack
@@ -144,9 +144,9 @@ bool KingPiece::IsInCheck(Board &board) const
                             king_coords.GetFile() + file_offset
                         );
 
-                        if (to == m_Coordinates)
+                        if (to == m_coordinates)
                         {
-                            util::Debugger::Debug(
+                            Util::Debugger::Debug(
                                 "[KingPiece::IsInCheck] king is next to enemy king\n"
                             );
                             return true;
@@ -159,7 +159,7 @@ bool KingPiece::IsInCheck(Board &board) const
                 auto moves = option.value()->GetPossibleMoves(board);
                 for (auto &move : moves)
                 {
-                    if (move.to == m_Coordinates)
+                    if (move.to == m_coordinates)
                     {
                         return true;
                     }
@@ -171,10 +171,10 @@ bool KingPiece::IsInCheck(Board &board) const
     return false;
 }
 
-bool KingPiece::CanCastleShort(Board &board) const
+bool KingPiece::_CanCastleShort(Board &board) const
 {
-    auto scope = util::Debugger::CreateScope("KingPiece::CanCastleShort");
-    if (m_HasMoved || IsInCheck(board))
+    auto scope = Util::Debugger::CreateScope("KingPiece::CanCastleShort");
+    if (m_moved || IsInCheck(board))
     {
         scope.Debug("king has already moved or is currently in check\n");
         return false;
@@ -187,7 +187,7 @@ bool KingPiece::CanCastleShort(Board &board) const
         for (auto file = 0; file < 8; file++)
         {
             auto option = board[rank][file];
-            if (!option.has_value() || option.value()->GetColor() != m_Color)
+            if (!option.has_value() || option.value()->GetColor() != m_color)
             {
                 continue;
             }
@@ -215,8 +215,8 @@ bool KingPiece::CanCastleShort(Board &board) const
     // Collect all opponent pieces' available moves and check if anything can see
     // squares in our path
     Coordinates check_against[2] = {
-        Coordinates(m_Color == Color::White ? 0 : 7, 5),
-        Coordinates(m_Color == Color::White ? 0 : 7, 6),
+        Coordinates(m_color == Color::White ? 0 : 7, 5),
+        Coordinates(m_color == Color::White ? 0 : 7, 6),
     };
 
     for (auto &coords : check_against)
@@ -233,7 +233,7 @@ bool KingPiece::CanCastleShort(Board &board) const
         for (auto file = 0; file < 8; file++)
         {
             auto option = board[rank][file];
-            if (option.has_value() && option.value()->GetColor() != m_Color)
+            if (option.has_value() && option.value()->GetColor() != m_color)
             {
                 // (white) KingPiece::GetPossibleMoves() -> KingPiece::CanCastleShort() ->
                 // (black) KingPiece::GetPossibleMoves() is a fatal stack overflow infinite
@@ -263,10 +263,10 @@ bool KingPiece::CanCastleShort(Board &board) const
     return true;
 }
 
-bool KingPiece::CanCastleLong(Board &board) const
+bool KingPiece::_CanCastleLong(Board &board) const
 {
-    auto scope = util::Debugger::CreateScope("KingPiece::CanCastleLong");
-    if (m_HasMoved || IsInCheck(board))
+    auto scope = Util::Debugger::CreateScope("KingPiece::CanCastleLong");
+    if (m_moved || IsInCheck(board))
     {
         scope.Debug("king has already moved or is currently in check\n");
         return false;
@@ -279,7 +279,7 @@ bool KingPiece::CanCastleLong(Board &board) const
         for (auto file = 0; file < 8; file++)
         {
             auto option = board[rank][file];
-            if (!option.has_value() || option.value()->GetColor() != m_Color)
+            if (!option.has_value() || option.value()->GetColor() != m_color)
             {
                 continue;
             }
@@ -307,9 +307,9 @@ bool KingPiece::CanCastleLong(Board &board) const
     // Collect all opponent pieces' available moves and check if anything can see
     // squares in our path
     Coordinates check_against[3] = {
-        Coordinates(m_Color == Color::White ? 0 : 7, 1),
-        Coordinates(m_Color == Color::White ? 0 : 7, 2),
-        Coordinates(m_Color == Color::White ? 0 : 7, 3),
+        Coordinates(m_color == Color::White ? 0 : 7, 1),
+        Coordinates(m_color == Color::White ? 0 : 7, 2),
+        Coordinates(m_color == Color::White ? 0 : 7, 3),
     };
 
     for (auto &coords : check_against)
@@ -326,7 +326,7 @@ bool KingPiece::CanCastleLong(Board &board) const
         for (auto file = 0; file < 8; file++)
         {
             auto option = board[rank][file];
-            if (option.has_value() && option.value()->GetColor() != m_Color)
+            if (option.has_value() && option.value()->GetColor() != m_color)
             {
                 // (white) KingPiece::GetPossibleMoves() -> KingPiece::CanCastleLong() ->
                 // (black) KingPiece::GetPossibleMoves() is a fatal stack overflow infinite
@@ -356,19 +356,19 @@ bool KingPiece::CanCastleLong(Board &board) const
     return true;
 }
 
-void KingPiece::MakeMove(Board &board, Move move, bool simulate)
+void KingPiece::_MakeMove(Board &board, Move move, bool simulate)
 {
-    Piece::MakeMove(board, move, simulate);
+    Piece::_MakeMove(board, move, simulate);
     if (!simulate)
     {
-        m_HasMoved = true;
+        m_moved = true;
     }
 
     // If we are castling, move the rook as well
     if (move.castleKind.has_value())
     {
         auto castle_kind = move.castleKind.value();
-        auto rook_rank = m_Color == Color::White ? 0 : 7;
+        auto rook_rank = m_color == Color::White ? 0 : 7;
         auto rook_file = castle_kind == CastleKind::Short ? 7 : 0;
 
         auto rook = dynamic_cast<RookPiece *>(board[rook_rank][rook_file].value());
@@ -376,9 +376,9 @@ void KingPiece::MakeMove(Board &board, Move move, bool simulate)
 
         auto new_coords = Coordinates(rook_rank, castle_kind == CastleKind::Short ? 5 : 3);
         rook->SetCoordinates(new_coords);
-        rook->SetMoved();
+        rook->SetHasMoved();
         BOARD_AT(new_coords) = rook;
         board[rook_rank][rook_file] = std::nullopt;
     }
 }
-} // namespace game
+} // namespace Game

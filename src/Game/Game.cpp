@@ -9,7 +9,7 @@
 #include "Piece/rook_piece.h"
 #include <optional>
 
-namespace game
+namespace Game
 {
 [[nodiscard]] static std::array<Piece *, 8> get_pieces(Color color)
 {
@@ -29,19 +29,19 @@ namespace game
     return pieces;
 }
 
-Game::Game() : m_CurrentPlayer(Color::White), m_State(GameState::Waiting)
+Game::Game() : m_current_player(Color::White), m_state(GameState::Waiting)
 {
     auto white_pieces = get_pieces(Color::White);
     for (auto file = 0; file < 8; file++)
     {
-        m_Board[0][file] = white_pieces[file];
-        m_Board[1][file] = new PawnPiece(Color::White, Coordinates(1, file));
+        m_board[0][file] = white_pieces[file];
+        m_board[1][file] = new PawnPiece(Color::White, Coordinates(1, file));
     }
     auto black_pieces = get_pieces(Color::Black);
     for (auto file = 0; file < 8; file++)
     {
-        m_Board[7][file] = black_pieces[file];
-        m_Board[6][file] = new PawnPiece(Color::Black, Coordinates(6, file));
+        m_board[7][file] = black_pieces[file];
+        m_board[6][file] = new PawnPiece(Color::Black, Coordinates(6, file));
     }
 }
 
@@ -51,11 +51,11 @@ Game::~Game()
     {
         for (auto file = 0; file < 8; file++)
         {
-            auto piece = m_Board[rank][file];
+            auto piece = m_board[rank][file];
             if (piece.has_value())
             {
                 delete piece.value();
-                m_Board[rank][file] = std::nullopt;
+                m_board[rank][file] = std::nullopt;
             }
         }
     }
@@ -63,27 +63,27 @@ Game::~Game()
 
 Color Game::GetCurrentPlayer() const
 {
-    return m_CurrentPlayer;
+    return m_current_player;
 }
 
 GameState Game::GetState() const
 {
-    return m_State;
+    return m_state;
 }
 
 Board Game::GetBoard() const
 {
-    return m_Board;
+    return m_board;
 }
 
 void Game::Resign()
 {
-    this->m_State = GameState::Ended;
+    this->m_state = GameState::Ended;
 }
 
 void Game::Draw()
 {
-    this->m_State = GameState::Draw;
+    this->m_state = GameState::Draw;
 }
 
 bool Game::MakeMove(Move move)
@@ -91,7 +91,7 @@ bool Game::MakeMove(Move move)
     // Considering <Piece>.MakeMove() does not ensure the king is not in check
     // after the move, the laziest way to do it is to always "simulate" moves
     // before committing them.
-    auto clone = CloneBoard(m_Board);
+    auto clone = CloneBoard(m_board);
     auto piece = clone[move.from.GetRank()][move.from.GetFile()].value();
     piece->MakeMove(clone, move);
 
@@ -109,7 +109,7 @@ bool Game::MakeMove(Move move)
             }
 
             auto piece = option.value();
-            if (piece->GetColor() == m_CurrentPlayer)
+            if (piece->GetColor() == m_current_player)
             {
                 auto found = dynamic_cast<KingPiece *>(piece);
                 if (found != nullptr)
@@ -117,7 +117,7 @@ bool Game::MakeMove(Move move)
                     king = found;
                     if (found->IsInCheck(clone))
                     {
-                        util::Debugger::Debug("[Game::MakeMove] King is in check after move\n");
+                        Util::Debugger::Debug("[Game::MakeMove] King is in check after move\n");
                         FreeBoard(clone);
                         return false;
                     }
@@ -134,17 +134,17 @@ bool Game::MakeMove(Move move)
         }
     }
 
-    FreeBoard(m_Board);
-    m_Board = clone;
+    FreeBoard(m_board);
+    m_board = clone;
 
-    m_State = king->GetIsMated() || enemy_king->GetIsMated() ? GameState::Ended : GameState::Waiting;
-    m_CurrentPlayer = m_CurrentPlayer == Color::White ? Color::Black : Color::White;
+    m_state = king->GetIsMated() || enemy_king->GetIsMated() ? GameState::Ended : GameState::Waiting;
+    m_current_player = m_current_player == Color::White ? Color::Black : Color::White;
 
     return true;
 }
 
 std::optional<Piece *> Game::operator[](const Coordinates &coordinates)
 {
-    return m_Board[coordinates.GetRank()][coordinates.GetFile()];
+    return m_board[coordinates.GetRank()][coordinates.GetFile()];
 }
-} // namespace game
+} // namespace Game

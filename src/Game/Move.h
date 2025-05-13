@@ -4,7 +4,7 @@
 #include <optional>
 #include <vector>
 
-namespace game
+namespace Game
 {
 enum class PromotionKind
 {
@@ -37,4 +37,4 @@ struct Move
     std::optional<PromotionKind> promotionKind;
     std::optional<CastleKind> castleKind;
 };
-} // namespace game
+} // namespace Game

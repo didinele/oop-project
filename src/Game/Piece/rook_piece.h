@@ -2,7 +2,7 @@
 
 #include "piece.h"
 
-namespace game
+namespace Game
 {
 enum class RookKind
 {
@@ -23,12 +23,12 @@ class RookPiece : public Piece
     [[nodiscard]] RookKind GetKind() const;
 
     [[nodiscard]] bool GetHasMoved() const;
-    void SetMoved();
+    void SetHasMoved();
 
   private:
-    RookKind m_Kind;
-    bool m_Moved;
+    RookKind m_kind;
+    bool m_moved;
 
-    void MakeMove(Board &board, Move move, bool simulate) override;
+    void _MakeMove(Board &board, Move move, bool simulate) override;
 };
-} // namespace game
+} // namespace Game

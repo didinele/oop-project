@@ -18,24 +18,24 @@
 #include <stb_image.h>
 #undef STB_IMAGE_IMPLEMENTATION
 
-namespace gui
+namespace GUI
 {
-ChessGUI::ChessGUI(game::Game *game) : m_Game(game)
+ChessGUI::ChessGUI(Game::Game *game) : m_game(game)
 {
-    if (!LoadPiecesTexture("resources/textures/chess_pieces.png"))
+    if (!_LoadPiecesTexture("resources/textures/chess_pieces.png"))
     {
         std::cerr << "Failed to load chess pieces texture!" << std::endl;
     }
-    util::Debugger::Debug("ChessGUI is init. For further debug logs, use the Debug menu.\n");
-    util::Debugger::SetDebugEnabled(false);
+    Util::Debugger::Debug("ChessGUI is init. For further debug logs, use the Debug menu.\n");
+    Util::Debugger::SetDebugEnabled(false);
 }
 
 ChessGUI::~ChessGUI()
 {
-    if (m_PiecesTextureID != 0)
+    if (m_pieces_texture_id != 0)
     {
-        glDeleteTextures(1, &m_PiecesTextureID);
-        m_PiecesTextureID = 0;
+        glDeleteTextures(1, &m_pieces_texture_id);
+        m_pieces_texture_id = 0;
     }
 }
 
@@ -60,38 +60,38 @@ void ChessGUI::Render()
         {
             if (ImGui::MenuItem("Resign"))
             {
-                m_Game->Resign();
-                m_DrawProposed = false;
-                m_SelectedSquare = std::nullopt;
-                m_PossibleMovesForSelected.clear();
+                m_game->Resign();
+                m_draw_proposed = false;
+                m_selected_square = std::nullopt;
+                m_possible_moves_for_selected.clear();
             }
 
-            if (m_DrawProposed)
+            if (m_draw_proposed)
             {
-                if (m_DrawProposedFor == m_Game->GetCurrentPlayer())
+                if (m_draw_proposed_for == m_game->GetCurrentPlayer())
                 {
 
                     if (ImGui::MenuItem("Accept Draw"))
                     {
-                        m_Game->Draw();
-                        m_DrawProposed = false;
-                        m_SelectedSquare = std::nullopt;
-                        m_PossibleMovesForSelected.clear();
+                        m_game->Draw();
+                        m_draw_proposed = false;
+                        m_selected_square = std::nullopt;
+                        m_possible_moves_for_selected.clear();
                     }
                     if (ImGui::MenuItem("Decline Draw"))
                     {
-                        m_DrawProposed = false;
+                        m_draw_proposed = false;
                     }
                 }
             }
-            else if (!m_DrawProposed && m_Game->GetState() == game::GameState::Waiting)
+            else if (!m_draw_proposed && m_game->GetState() == Game::GameState::Waiting)
             {
                 if (ImGui::MenuItem("Propose Draw"))
                 {
-                    m_DrawProposed = true;
-                    m_DrawProposedFor = m_Game->GetCurrentPlayer() == game::Color::White
-                                            ? game::Color::Black
-                                            : game::Color::White;
+                    m_draw_proposed = true;
+                    m_draw_proposed_for = m_game->GetCurrentPlayer() == Game::Color::White
+                                              ? Game::Color::Black
+                                              : Game::Color::White;
                 }
             }
 
@@ -102,10 +102,10 @@ void ChessGUI::Render()
         {
             if (ImGui::MenuItem("Flip Board"))
             {
-                m_IsNormalBoardView = !m_IsNormalBoardView;
+                m_is_normal_board_view = !m_is_normal_board_view;
             }
 
-            if (ImGui::Checkbox("Flip Board on Move", &m_FlipBoardOnMove))
+            if (ImGui::Checkbox("Flip Board on Move", &m_flip_board_on_move))
             {
                 // no-op
             }
@@ -116,10 +116,10 @@ void ChessGUI::Render()
 #ifndef NDEBUG
         if (ImGui::BeginMenu("Debug"))
         {
-            bool debug_enabled = util::Debugger::IsDebugEnabled();
+            bool debug_enabled = Util::Debugger::IsDebugEnabled();
             if (ImGui::Checkbox("Enable Debug Output", &debug_enabled))
             {
-                util::Debugger::SetDebugEnabled(debug_enabled);
+                Util::Debugger::SetDebugEnabled(debug_enabled);
             }
 
             ImGui::EndMenu();
@@ -128,44 +128,44 @@ void ChessGUI::Render()
         ImGui::EndMainMenuBar();
     }
 
-    auto turn = (m_Game->GetCurrentPlayer() == game::Color::White) ? "White" : "Black";
+    auto turn = (m_game->GetCurrentPlayer() == Game::Color::White) ? "White" : "Black";
 
-    auto state = m_Game->GetState();
+    auto state = m_game->GetState();
     switch (state)
     {
-        case game::GameState::Waiting: {
+        case Game::GameState::Waiting: {
             ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s to move", turn);
             break;
         }
-        case game::GameState::Ended: {
-            auto opposite = (m_Game->GetCurrentPlayer() == game::Color::White) ? "Black" : "White";
+        case Game::GameState::Ended: {
+            auto opposite = (m_game->GetCurrentPlayer() == Game::Color::White) ? "Black" : "White";
             ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s won", opposite);
             break;
         }
-        case game::GameState::Draw: {
+        case Game::GameState::Draw: {
             ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Draw by agreement");
             break;
         }
     }
 
     // Determine the largest possible square size that fits within the window
-    m_SquareSize = std::min(window_size.x, window_size.y) / 8.0f;
+    m_square_size = std::min(window_size.x, window_size.y) / 8.0f;
 
-    auto board_width = 8.0f * m_SquareSize;
-    auto board_height = 8.0f * m_SquareSize;
+    auto board_width = 8.0f * m_square_size;
+    auto board_height = 8.0f * m_square_size;
 
     // Calculate the top-left starting position to center the board
-    m_BoardStartX = viewport->WorkPos.x + (window_size.x - board_width) / 2.0f;
-    m_BoardStartY = viewport->WorkPos.y + (window_size.y - board_height) / 2.0f;
+    m_board_startX = viewport->WorkPos.x + (window_size.x - board_width) / 2.0f;
+    m_board_startY = viewport->WorkPos.y + (window_size.y - board_height) / 2.0f;
 
     auto draw_list = ImGui::GetWindowDrawList();
 
-    DrawBoard(*draw_list);
-    if (m_PiecesTextureID != 0)
+    _DrawBoard(*draw_list);
+    if (m_pieces_texture_id != 0)
     {
-        DrawPieces(*draw_list);
+        _DrawPieces(*draw_list);
         // Draw highlights after pieces so they're visible on top
-        DrawHighlights(*draw_list);
+        _DrawHighlights(*draw_list);
     }
     else
     {
@@ -173,131 +173,136 @@ void ChessGUI::Render()
     }
 
     // Draw promotion dialog if active, otherwise handle input normally
-    if (m_PromotionDialogActive)
+    if (m_promotion_dialog_active)
     {
-        DrawPromotionDialog();
+        _DrawPromotionDialog();
     }
     else
     {
-        HandleInput();
+        _HandleInput();
     }
 
     ImGui::End();
 }
 
-void ChessGUI::DrawBoard(ImDrawList &draw_list)
+void ChessGUI::_DrawBoard(ImDrawList &draw_list)
 {
     for (int rank = 0; rank < 8; ++rank)
     {
         for (int file = 0; file < 8; ++file)
         {
             auto in_light_square = (rank + file) % 2 != 0;
-            ImVec4 square_color = in_light_square ? m_LightSquareColor : m_DarkSquareColor;
+            ImVec4 square_color = in_light_square ? m_light_square_color : m_dark_square_color;
 
-            game::Coordinates coords(rank, file);
-            ImVec2 p_min = GetScreenPos(coords);
-            ImVec2 p_max = ImVec2(p_min.x + m_SquareSize, p_min.y + m_SquareSize);
+            Game::Coordinates coords(rank, file);
+            ImVec2 p_min = _GetScreenPos(coords);
+            ImVec2 p_max = ImVec2(p_min.x + m_square_size, p_min.y + m_square_size);
 
             draw_list.AddRectFilled(p_min, p_max, ImGui::ColorConvertFloat4ToU32(square_color));
         }
     }
 }
 
-void ChessGUI::DrawPieces(ImDrawList &drawList)
+void ChessGUI::_DrawPieces(ImDrawList &drawList)
 {
-    if (m_PiecesTextureID == 0 || m_TextureWidth == 0 || m_TextureHeight == 0)
+    if (m_pieces_texture_id == 0 || m_texture_width == 0 || m_texture_height == 0)
     {
         return;
     }
 
     // Width of one piece in texture
-    const auto piece_tex_width = static_cast<float>(m_TextureWidth) / 6.0f;
+    const auto piece_tex_width = static_cast<float>(m_texture_width) / 6.0f;
     // Height of one piece in texture
-    const auto piece_tex_height = static_cast<float>(m_TextureHeight) / 2.0f;
+    const auto piece_tex_height = static_cast<float>(m_texture_height) / 2.0f;
 
     for (int rank = 0; rank < 8; ++rank)
     {
         for (int file = 0; file < 8; ++file)
         {
-            auto coords = game::Coordinates(rank, file);
-            if (m_Game->operator[](coords).has_value())
+            auto coords = Game::Coordinates(rank, file);
+            if (m_game->operator[](coords).has_value())
             {
-                auto piece = m_Game->operator[](coords).value();
+                auto piece = m_game->operator[](coords).value();
 
                 // Column index in the texture (0-5)
                 int col = -1;
                 // Row index in the texture atlas (0=white, 1=black)
                 int row = -1;
 
-                if (dynamic_cast<const game::KingPiece *>(piece))
+                if (dynamic_cast<const Game::KingPiece *>(piece))
                     col = 0;
-                else if (dynamic_cast<const game::QueenPiece *>(piece))
+                else if (dynamic_cast<const Game::QueenPiece *>(piece))
                     col = 1;
-                else if (dynamic_cast<const game::BishopPiece *>(piece))
+                else if (dynamic_cast<const Game::BishopPiece *>(piece))
                     col = 2;
-                else if (dynamic_cast<const game::KnightPiece *>(piece))
+                else if (dynamic_cast<const Game::KnightPiece *>(piece))
                     col = 3;
-                else if (dynamic_cast<const game::RookPiece *>(piece))
+                else if (dynamic_cast<const Game::RookPiece *>(piece))
                     col = 4;
-                else if (dynamic_cast<const game::PawnPiece *>(piece))
+                else if (dynamic_cast<const Game::PawnPiece *>(piece))
                     col = 5;
 
-                if (piece->GetColor() == game::Color::White)
+                if (piece->GetColor() == Game::Color::White)
                     row = 0;
-                else if (piece->GetColor() == game::Color::Black)
+                else if (piece->GetColor() == Game::Color::Black)
                     row = 1;
 
                 if (col != -1 && row != -1)
                 {
                     // Calculate coordinates
-                    auto u0 = (col * piece_tex_width) / m_TextureWidth;
-                    auto v0 = (row * piece_tex_height) / m_TextureHeight;
-                    auto u1 = ((col + 1) * piece_tex_width) / m_TextureWidth;
-                    auto v1 = ((row + 1) * piece_tex_height) / m_TextureHeight;
+                    auto u0 = (col * piece_tex_width) / m_texture_width;
+                    auto v0 = (row * piece_tex_height) / m_texture_height;
+                    auto u1 = ((col + 1) * piece_tex_width) / m_texture_width;
+                    auto v1 = ((row + 1) * piece_tex_height) / m_texture_height;
 
                     // Get screen position for the square
-                    ImVec2 p_min = GetScreenPos(coords);
-                    ImVec2 p_max = ImVec2(p_min.x + m_SquareSize, p_min.y + m_SquareSize);
+                    ImVec2 p_min = _GetScreenPos(coords);
+                    ImVec2 p_max = ImVec2(p_min.x + m_square_size, p_min.y + m_square_size);
 
-                    drawList
-                        .AddImage(m_PiecesTextureID, p_min, p_max, ImVec2(u0, v0), ImVec2(u1, v1));
+                    drawList.AddImage(
+                        m_pieces_texture_id,
+                        p_min,
+                        p_max,
+                        ImVec2(u0, v0),
+                        ImVec2(u1, v1)
+                    );
                 }
             }
         }
     }
 }
 
-void gui::ChessGUI::DrawHighlights(ImDrawList &draw_list)
+void GUI::ChessGUI::_DrawHighlights(ImDrawList &draw_list)
 {
     // Draw highlight for selected square
-    if (m_SelectedSquare.has_value())
+    if (m_selected_square.has_value())
     {
-        game::Coordinates coords = m_SelectedSquare.value();
-        ImVec2 p_min = GetScreenPos(coords);
-        ImVec2 p_max = ImVec2(p_min.x + m_SquareSize, p_min.y + m_SquareSize);
+        Game::Coordinates coords = m_selected_square.value();
+        ImVec2 p_min = _GetScreenPos(coords);
+        ImVec2 p_max = ImVec2(p_min.x + m_square_size, p_min.y + m_square_size);
 
-        draw_list.AddRectFilled(p_min, p_max, ImGui::ColorConvertFloat4ToU32(m_HighlightColor));
+        draw_list.AddRectFilled(p_min, p_max, ImGui::ColorConvertFloat4ToU32(m_highlight_color));
 
         // Draw highlights for possible moves
-        for (auto &move : m_PossibleMovesForSelected)
+        for (auto &move : m_possible_moves_for_selected)
         {
-            ImVec2 move_p_min = GetScreenPos(move.to);
+            ImVec2 move_p_min = _GetScreenPos(move.to);
             // Draw a circle for possible moves
             draw_list.AddCircleFilled(
-                ImVec2(move_p_min.x + m_SquareSize * 0.5f, move_p_min.y + m_SquareSize * 0.5f),
-                m_SquareSize * 0.2f,
-                ImGui::ColorConvertFloat4ToU32(m_HighlightColor)
+                ImVec2(move_p_min.x + m_square_size * 0.5f, move_p_min.y + m_square_size * 0.5f),
+                m_square_size * 0.2f,
+                ImGui::ColorConvertFloat4ToU32(m_highlight_color)
             );
         }
     }
 }
 
-void ChessGUI::HandleInput()
+void ChessGUI::_HandleInput()
 {
-    auto scope = util::Debugger::CreateScope("ChessGUI::HandleInput");
+    auto scope = Util::Debugger::CreateScope("ChessGUI::HandleInput");
 
     static bool logged_game_over = false;
-    if (m_Game->GetState() != game::GameState::Waiting)
+    if (m_game->GetState() != Game::GameState::Waiting)
     {
         if (!logged_game_over)
         {
@@ -309,7 +314,7 @@ void ChessGUI::HandleInput()
 
     auto mouse_pos_rel = ImGui::GetMousePos();
     auto is_mouse_over_board = false;
-    auto coords_option = GetCoordsFromScreenPos(mouse_pos_rel);
+    auto coords_option = _GetCoordsFromScreenPos(mouse_pos_rel);
 
     if (coords_option.has_value())
     {
@@ -317,17 +322,17 @@ void ChessGUI::HandleInput()
     }
 
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && is_mouse_over_board &&
-        !m_PromotionDialogActive)
+        !m_promotion_dialog_active)
     {
         auto clicked_coords = coords_option.value();
-        auto clicked_square_option = m_Game->operator[](clicked_coords);
+        auto clicked_square_option = m_game->operator[](clicked_coords);
 
-        if (m_SelectedSquare.has_value())
+        if (m_selected_square.has_value())
         {
             bool is_move_target = false;
-            game::Move move_to_make(m_SelectedSquare.value(), clicked_coords);
+            Game::Move move_to_make(m_selected_square.value(), clicked_coords);
 
-            for (const auto &possible_move : m_PossibleMovesForSelected)
+            for (const auto &possible_move : m_possible_moves_for_selected)
             {
                 if (possible_move.to == clicked_coords)
                 {
@@ -337,9 +342,9 @@ void ChessGUI::HandleInput()
                     if (possible_move.promotionKind.has_value())
                     {
                         // Don't make the move immediately, activate promotion dialog instead
-                        m_PromotionDialogActive = true;
-                        m_PendingPromotionMove =
-                            game::Move(m_SelectedSquare.value(), clicked_coords);
+                        m_promotion_dialog_active = true;
+                        m_pending_promotion_move =
+                            Game::Move(m_selected_square.value(), clicked_coords);
 
                         scope.Debug("Promotion move detected, showing dialog\n");
                         return;
@@ -353,16 +358,16 @@ void ChessGUI::HandleInput()
             {
                 scope.Debug(
                     "Found within PossibleMoves, trying: from %d,%d to %d,%d.\n",
-                    m_SelectedSquare.value().GetRank(),
-                    m_SelectedSquare.value().GetFile(),
+                    m_selected_square.value().GetRank(),
+                    m_selected_square.value().GetFile(),
                     clicked_coords.GetRank(),
                     clicked_coords.GetFile()
                 );
 
-                auto move_made = m_Game->MakeMove(move_to_make);
+                auto move_made = m_game->MakeMove(move_to_make);
                 scope.Debug("Move made: %s\n", move_made ? "true" : "false");
 
-                HandleMoveAftermath(move_made);
+                _HandleMoveAftermath(move_made);
             }
             else
             {
@@ -374,36 +379,37 @@ void ChessGUI::HandleInput()
 
                 // If the user clicked a diff. piece of their color, select that instead
                 if (clicked_square_option.has_value() &&
-                    clicked_square_option.value()->GetColor() == m_Game->GetCurrentPlayer())
+                    clicked_square_option.value()->GetColor() == m_game->GetCurrentPlayer())
                 {
-                    m_SelectedSquare = clicked_coords;
-                    auto board = m_Game->GetBoard();
-                    m_PossibleMovesForSelected =
+                    m_selected_square = clicked_coords;
+                    auto board = m_game->GetBoard();
+                    m_possible_moves_for_selected =
                         clicked_square_option.value()->GetPossibleMoves(board);
                 }
                 else
                 {
                     // Clicked empty square or opponent piece - deselect
-                    m_SelectedSquare = std::nullopt;
-                    m_PossibleMovesForSelected.clear();
+                    m_selected_square = std::nullopt;
+                    m_possible_moves_for_selected.clear();
                 }
             }
         }
         else
         {
             if (clicked_square_option.has_value() &&
-                clicked_square_option.value()->GetColor() == m_Game->GetCurrentPlayer())
+                clicked_square_option.value()->GetColor() == m_game->GetCurrentPlayer())
             {
                 // Clicked on a piece of the current player's color, select it
-                m_SelectedSquare = clicked_coords;
+                m_selected_square = clicked_coords;
                 // Get valid moves for the selected piece
-                auto board = m_Game->GetBoard();
-                m_PossibleMovesForSelected = clicked_square_option.value()->GetPossibleMoves(board);
+                auto board = m_game->GetBoard();
+                m_possible_moves_for_selected =
+                    clicked_square_option.value()->GetPossibleMoves(board);
                 scope.Debug(
                     "Selected square: %d,%d, possible move count: %zu\n",
                     clicked_coords.GetRank(),
                     clicked_coords.GetFile(),
-                    m_PossibleMovesForSelected.size()
+                    m_possible_moves_for_selected.size()
                 );
             }
             else
@@ -415,20 +421,20 @@ void ChessGUI::HandleInput()
                     clicked_coords.GetFile()
                 );
                 // Clicked empty square or opponent piece - do nothing
-                m_SelectedSquare = std::nullopt;
-                m_PossibleMovesForSelected.clear();
+                m_selected_square = std::nullopt;
+                m_possible_moves_for_selected.clear();
             }
         }
     }
     else if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !is_mouse_over_board)
     {
         // Clicked outside the board area, deselect anything selected
-        m_SelectedSquare = std::nullopt;
-        m_PossibleMovesForSelected.clear();
+        m_selected_square = std::nullopt;
+        m_possible_moves_for_selected.clear();
     }
 }
 
-void ChessGUI::DrawPromotionDialog()
+void ChessGUI::_DrawPromotionDialog()
 {
     ImGui::SetNextWindowPos(
         ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f),
@@ -439,7 +445,7 @@ void ChessGUI::DrawPromotionDialog()
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                              ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize;
 
-    if (ImGui::Begin("Promote Pawn", &m_PromotionDialogActive, flags))
+    if (ImGui::Begin("Promote Pawn", &m_promotion_dialog_active, flags))
     {
         ImGui::Text("Choose a piece for promotion:");
 
@@ -458,40 +464,44 @@ void ChessGUI::DrawPromotionDialog()
         if (ImGui::Button("Confirm", ImVec2(120, 0)))
         {
             // Apply the selected promotion
-            game::PromotionKind promotion_kind;
+            Game::PromotionKind promotion_kind;
 
             switch (current_promotion)
             {
                 case 0: {
-                    promotion_kind = game::PromotionKind::Queen;
+                    promotion_kind = Game::PromotionKind::Queen;
                     break;
                 }
                 case 1: {
-                    promotion_kind = game::PromotionKind::Rook;
+                    promotion_kind = Game::PromotionKind::Rook;
                     break;
                 }
                 case 2: {
-                    promotion_kind = game::PromotionKind::Bishop;
+                    promotion_kind = Game::PromotionKind::Bishop;
                     break;
                 }
                 case 3: {
-                    promotion_kind = game::PromotionKind::Knight;
+                    promotion_kind = Game::PromotionKind::Knight;
                     break;
                 }
                 default: {
-                    promotion_kind = game::PromotionKind::Queen;
+                    promotion_kind = Game::PromotionKind::Queen;
                     break;
                 }
             }
 
             // Update the pending move with the chosen promotion kind
-            game::Move move(m_PendingPromotionMove.from, m_PendingPromotionMove.to, promotion_kind);
+            Game::Move move(
+                m_pending_promotion_move.from,
+                m_pending_promotion_move.to,
+                promotion_kind
+            );
 
             // Complete the move
-            auto move_made = m_Game->MakeMove(move);
-            HandleMoveAftermath(move_made);
+            auto move_made = m_game->MakeMove(move);
+            _HandleMoveAftermath(move_made);
 
-            m_PromotionDialogActive = false;
+            m_promotion_dialog_active = false;
             current_promotion = 0;
         }
 
@@ -499,7 +509,7 @@ void ChessGUI::DrawPromotionDialog()
 
         if (ImGui::Button("Cancel", ImVec2(120, 0)))
         {
-            m_PromotionDialogActive = false;
+            m_promotion_dialog_active = false;
             current_promotion = 0;
         }
     }
@@ -507,32 +517,32 @@ void ChessGUI::DrawPromotionDialog()
     ImGui::End();
 }
 
-ImVec2 ChessGUI::GetScreenPos(game::Coordinates coords) const
+ImVec2 ChessGUI::_GetScreenPos(Game::Coordinates coords) const
 {
-    if (m_IsNormalBoardView)
+    if (m_is_normal_board_view)
     {
 
-        auto x = m_BoardStartX + coords.GetFile() * m_SquareSize;
-        auto y = m_BoardStartY + (7 - coords.GetRank()) * m_SquareSize;
+        auto x = m_board_startX + coords.GetFile() * m_square_size;
+        auto y = m_board_startY + (7 - coords.GetRank()) * m_square_size;
         return ImVec2(x, y);
     }
     else
     {
-        auto x = m_BoardStartX + coords.GetFile() * m_SquareSize;
-        auto y = m_BoardStartY + coords.GetRank() * m_SquareSize;
+        auto x = m_board_startX + coords.GetFile() * m_square_size;
+        auto y = m_board_startY + coords.GetRank() * m_square_size;
         return ImVec2(x, y);
     }
 }
 
-std::optional<game::Coordinates> ChessGUI::GetCoordsFromScreenPos(ImVec2 pos) const
+std::optional<Game::Coordinates> ChessGUI::_GetCoordsFromScreenPos(ImVec2 pos) const
 {
     // Calculate total board dimensions
-    auto board_pixel_width = 8.0f * m_SquareSize;
-    auto board_pixel_height = 8.0f * m_SquareSize;
+    auto board_pixel_width = 8.0f * m_square_size;
+    auto board_pixel_height = 8.0f * m_square_size;
 
     // Calculate potential board indices based on mouse position relative to board top-left
-    auto relative_x = pos.x - m_BoardStartX;
-    auto relative_y = pos.y - m_BoardStartY;
+    auto relative_x = pos.x - m_board_startX;
+    auto relative_y = pos.y - m_board_startY;
 
     // Check if the click is within the board's pixel boundaries
     if (relative_x < 0 || relative_x >= board_pixel_width || relative_y < 0 ||
@@ -541,46 +551,46 @@ std::optional<game::Coordinates> ChessGUI::GetCoordsFromScreenPos(ImVec2 pos) co
         return std::nullopt;
     }
 
-    auto file = std::min(7, std::max(0, static_cast<int>(relative_x / m_SquareSize)));
+    auto file = std::min(7, std::max(0, static_cast<int>(relative_x / m_square_size)));
     auto rank = std::min(
         7,
         std::max(
             0,
-            m_IsNormalBoardView ? 7 - static_cast<int>(relative_y / m_SquareSize)
-                                : static_cast<int>(relative_y / m_SquareSize)
+            m_is_normal_board_view ? 7 - static_cast<int>(relative_y / m_square_size)
+                                   : static_cast<int>(relative_y / m_square_size)
         )
     );
 
-    return game::Coordinates(rank, file);
+    return Game::Coordinates(rank, file);
 }
 
-void ChessGUI::HandleMoveAftermath(bool move_made)
+void ChessGUI::_HandleMoveAftermath(bool move_made)
 {
-    auto scope = util::Debugger::CreateScope("ChessGUI::HandleMoveAftermath");
+    auto scope = Util::Debugger::CreateScope("ChessGUI::HandleMoveAftermath");
 
     if (move_made)
     {
         // Note the inverted check, since at this point GetCurrentPlayer is flipped
-        if (m_DrawProposed && m_DrawProposedFor != m_Game->GetCurrentPlayer())
+        if (m_draw_proposed && m_draw_proposed_for != m_game->GetCurrentPlayer())
         {
             // Implicitly rejected
             scope.Debug("Draw proposal implicitly rejected\n");
-            m_DrawProposed = false;
+            m_draw_proposed = false;
         }
 
-        if (m_FlipBoardOnMove)
+        if (m_flip_board_on_move)
         {
-            m_IsNormalBoardView = m_Game->GetCurrentPlayer() == game::Color::White;
+            m_is_normal_board_view = m_game->GetCurrentPlayer() == Game::Color::White;
             scope.Debug("Swapped board view\n");
         }
     }
 
     // Deselect regardless of outcome
-    m_SelectedSquare = std::nullopt;
-    m_PossibleMovesForSelected.clear();
+    m_selected_square = std::nullopt;
+    m_possible_moves_for_selected.clear();
 }
 
-bool ChessGUI::LoadPiecesTexture(const char *filename)
+bool ChessGUI::_LoadPiecesTexture(const char *filename)
 {
     int width, height, channels_in_file;
     auto data = stbi_load(filename, &width, &height, &channels_in_file, 4);
@@ -591,11 +601,11 @@ bool ChessGUI::LoadPiecesTexture(const char *filename)
         return false;
     }
 
-    m_TextureWidth = width;
-    m_TextureHeight = height;
+    m_texture_width = width;
+    m_texture_height = height;
 
-    glGenTextures(1, &m_PiecesTextureID);
-    glBindTexture(GL_TEXTURE_2D, m_PiecesTextureID);
+    glGenTextures(1, &m_pieces_texture_id);
+    glBindTexture(GL_TEXTURE_2D, m_pieces_texture_id);
 
     // Set texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -610,7 +620,7 @@ bool ChessGUI::LoadPiecesTexture(const char *filename)
     stbi_image_free(data);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    util::Debugger::Debug(
+    Util::Debugger::Debug(
         "Loaded texture: %s (%d x %d, %d channels in file, loaded as RGBA)\n",
         filename,
         width,
@@ -618,6 +628,6 @@ bool ChessGUI::LoadPiecesTexture(const char *filename)
         channels_in_file
     );
 
-    return m_PiecesTextureID != 0;
+    return m_pieces_texture_id != 0;
 }
-} // namespace gui
+} // namespace GUI

@@ -2,7 +2,7 @@
 
 #include "piece.h"
 
-namespace game
+namespace Game
 {
 class KingPiece : public Piece
 {
@@ -17,12 +17,12 @@ class KingPiece : public Piece
     [[nodiscard]] bool IsInCheck(Board &board) const;
 
   private:
-    bool m_HasMoved = false;
-    bool m_IsMated = false;
+    bool m_moved = false;
+    bool m_mated = false;
 
-    [[nodiscard]] bool CanCastleShort(Board &board) const;
-    [[nodiscard]] bool CanCastleLong(Board &board) const;
+    [[nodiscard]] bool _CanCastleShort(Board &board) const;
+    [[nodiscard]] bool _CanCastleLong(Board &board) const;
 
-    void MakeMove(Board &board, Move move, bool simulate) override;
+    void _MakeMove(Board &board, Move move, bool simulate) override;
 };
-} // namespace game
+} // namespace Game

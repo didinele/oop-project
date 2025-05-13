@@ -1,19 +1,19 @@
 #include "rook_piece.h"
 
-namespace game
+namespace Game
 {
 RookPiece::RookPiece(Color color, Coordinates coords)
-    : Piece(color, coords), m_Kind(RookKind::Noop), m_Moved(true)
+    : Piece(color, coords), m_kind(RookKind::Noop), m_moved(true)
 {
 }
 RookPiece::RookPiece(Color color, Coordinates coords, RookKind kind)
-    : Piece(color, coords), m_Kind(kind), m_Moved(false)
+    : Piece(color, coords), m_kind(kind), m_moved(false)
 {
 }
 
 std::vector<Move> RookPiece::GetPossibleMoves(Board &board) const
 {
-    return GetNaiveMovesInDirections(
+    return _GetNaiveMovesInDirections(
         board,
         std::vector<std::array<short, 2>>{
             {1, 0},  // up
@@ -26,33 +26,33 @@ std::vector<Move> RookPiece::GetPossibleMoves(Board &board) const
 
 Piece *RookPiece::Clone() const
 {
-    auto other = new RookPiece(m_Color, m_Coordinates, m_Kind);
-    other->m_Moved = m_Moved;
+    auto other = new RookPiece(m_color, m_coordinates, m_kind);
+    other->m_moved = m_moved;
 
     return other;
 }
 
 RookKind RookPiece::GetKind() const
 {
-    return m_Kind;
+    return m_kind;
 }
 
 bool RookPiece::GetHasMoved() const
 {
-    return m_Moved;
+    return m_moved;
 }
 
-void RookPiece::SetMoved()
+void RookPiece::SetHasMoved()
 {
-    m_Moved = true;
+    m_moved = true;
 }
 
-void RookPiece::MakeMove(Board &board, Move move, bool simulate)
+void RookPiece::_MakeMove(Board &board, Move move, bool simulate)
 {
-    Piece::MakeMove(board, move, simulate);
+    Piece::_MakeMove(board, move, simulate);
     if (!simulate)
     {
-        m_Moved = true;
+        m_moved = true;
     }
 }
-} // namespace game
+} // namespace Game

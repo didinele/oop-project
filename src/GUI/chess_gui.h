@@ -7,70 +7,70 @@
 #include <optional>
 #include <vector>
 
-namespace gui
+namespace GUI
 {
 
 class ChessGUI
 {
   public:
-    ChessGUI(game::Game *game);
+    ChessGUI(Game::Game *game);
     ~ChessGUI();
 
     void Render();
 
   private:
-    game::Game *m_Game;
+    Game::Game *m_game;
 
     // Draws
-    bool m_DrawProposed = false;
-    game::Color m_DrawProposedFor = game::Color::White;
+    bool m_draw_proposed = false;
+    Game::Color m_draw_proposed_for = Game::Color::White;
 
     // Board flipping
-    bool m_FlipBoardOnMove = true;
-    bool m_IsNormalBoardView = true;
+    bool m_flip_board_on_move = true;
+    bool m_is_normal_board_view = true;
 
     // Promotion UI
-    bool m_PromotionDialogActive = false;
-    game::Move m_PendingPromotionMove =
-        game::Move(game::Coordinates(0, 0), game::Coordinates(0, 0));
+    bool m_promotion_dialog_active = false;
+    Game::Move m_pending_promotion_move =
+        Game::Move(Game::Coordinates(0, 0), Game::Coordinates(0, 0));
 
     // UI stuff
-    float m_SquareSize = 64.0f;
-    float m_BoardStartX = 50.0f;
-    float m_BoardStartY = 50.0f;
+    float m_square_size = 64.0f;
+    float m_board_startX = 50.0f;
+    float m_board_startY = 50.0f;
     // Light beige
-    ImVec4 m_LightSquareColor = ImVec4(0.93f, 0.93f, 0.82f, 1.0f);
+    ImVec4 m_light_square_color = ImVec4(0.93f, 0.93f, 0.82f, 1.0f);
     // Green
-    ImVec4 m_DarkSquareColor = ImVec4(0.48f, 0.62f, 0.44f, 1.0f);
+    ImVec4 m_dark_square_color = ImVec4(0.48f, 0.62f, 0.44f, 1.0f);
     // Yellow highlight
-    ImVec4 m_HighlightColor = ImVec4(1.0f, 1.0f, 0.0f, 0.4f);
+    ImVec4 m_highlight_color = ImVec4(1.0f, 1.0f, 0.0f, 0.4f);
 
     // Game state interaction state
-    std::optional<game::Coordinates> m_SelectedSquare = std::nullopt;
-    std::vector<game::Move> m_PossibleMovesForSelected;
+    std::optional<Game::Coordinates> m_selected_square = std::nullopt;
+    std::vector<Game::Move> m_possible_moves_for_selected;
 
     // Texture related members
-    GLuint m_PiecesTextureID = 0;
-    int m_TextureWidth = 0;
-    int m_TextureHeight = 0;
+    GLuint m_pieces_texture_id = 0;
+    int m_texture_width = 0;
+    int m_texture_height = 0;
 
     // Drawing helpers
-    void DrawBoard(ImDrawList &draw_list);
-    void DrawPieces(ImDrawList &draw_list);
-    void DrawHighlights(ImDrawList &draw_list);
-    void DrawPromotionDialog();
+    void _DrawBoard(ImDrawList &draw_list);
+    void _DrawPieces(ImDrawList &draw_list);
+    void _DrawHighlights(ImDrawList &draw_list);
+    void _DrawPromotionDialog();
 
     // Input handling
-    void HandleInput();
+    void _HandleInput();
 
     // Common move processing
-    void HandleMoveAftermath(bool move_made);
+    void _HandleMoveAftermath(bool move_made);
 
     // Coordinate conversion helpers
-    ImVec2 GetScreenPos(game::Coordinates coords) const;
-    std::optional<game::Coordinates> GetCoordsFromScreenPos(ImVec2 pos) const;
+    ImVec2 _GetScreenPos(Game::Coordinates coords) const;
+    std::optional<Game::Coordinates> _GetCoordsFromScreenPos(ImVec2 pos) const;
 
     // Texture loading helper
-    bool LoadPiecesTexture(const char *filename);
+    bool _LoadPiecesTexture(const char *filename);
 };
-} // namespace gui
+} // namespace GUI

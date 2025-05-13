@@ -1,7 +1,7 @@
 #include "bishop_piece.h"
 #include <vector>
 
-namespace game
+namespace Game
 {
 BishopPiece::BishopPiece(Color color, Coordinates coords) : Piece(color, coords)
 {
@@ -9,7 +9,7 @@ BishopPiece::BishopPiece(Color color, Coordinates coords) : Piece(color, coords)
 
 std::vector<Move> BishopPiece::GetPossibleMoves(Board &board) const
 {
-    return GetNaiveMovesInDirections(
+    return _GetNaiveMovesInDirections(
         board,
         std::vector<std::array<short, 2>>{
             {1, -1},  // top left
@@ -22,6 +22,6 @@ std::vector<Move> BishopPiece::GetPossibleMoves(Board &board) const
 
 Piece *BishopPiece::Clone() const
 {
-    return new BishopPiece(m_Color, m_Coordinates);
+    return new BishopPiece(m_color, m_coordinates);
 }
-} // namespace game
+} // namespace Game

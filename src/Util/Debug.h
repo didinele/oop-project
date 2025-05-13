@@ -2,7 +2,7 @@
 
 #include <cstdarg>
 
-namespace util
+namespace Util
 {
 class ScopedDebugger
 {
@@ -10,7 +10,7 @@ class ScopedDebugger
     void Debug(const char *format, ...);
 
   private:
-    const char *m_Scope;
+    const char *m_scope;
 
     ScopedDebugger(const char *scope);
     ScopedDebugger(const ScopedDebugger &) = delete;
@@ -26,8 +26,8 @@ class Debugger
     Debugger(const Debugger &) = delete;
     Debugger &operator=(const Debugger &) = delete;
 
-    static constexpr char s_DebugPrefix[] = "[DEBUG] ";
-    static constexpr auto s_DebugPrefixLen = sizeof(s_DebugPrefix) - 1;
+    static constexpr char s_debug_prefix[] = "[DEBUG] ";
+    static constexpr auto s_debug_prefix_len = sizeof(s_debug_prefix) - 1;
 
     static void SetDebugEnabled(bool enabled);
     static void Debug(const char *format, ...);
@@ -38,10 +38,10 @@ class Debugger
 
   private:
 #ifndef NDEBUG
-    static bool s_DebugEnabled;
+    static bool s_debug_enabled;
 #endif
-    static void Write(const char *format, std::va_list args);
+    static void _Write(const char *format, std::va_list args);
 
     friend class ScopedDebugger;
 };
-} // namespace util
+} // namespace Util

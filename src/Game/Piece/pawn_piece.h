@@ -2,7 +2,7 @@
 
 #include "piece.h"
 
-namespace game
+namespace Game
 {
 class PawnPiece : public Piece
 {
@@ -11,12 +11,12 @@ class PawnPiece : public Piece
     [[nodiscard]] std::vector<Move> GetPossibleMoves(Board &board) const override;
     [[nodiscard]] virtual Piece *Clone() const override;
 
-    void MakeMove(Board &board, Move move, bool simulate) override;
-
     void SetEnPassantMoves(std::vector<Move> moves);
 
   private:
-    bool m_Moved = false;
-    std::vector<Move> m_EnPassantMoves;
+    bool m_moved = false;
+    std::vector<Move> m_en_passant_moves;
+
+    void _MakeMove(Board &board, Move move, bool simulate) override;
 };
-} // namespace game
+} // namespace Game

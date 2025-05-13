@@ -4,7 +4,7 @@
 #include "coordinates.h"
 #include <optional>
 
-namespace game
+namespace Game
 {
 enum class GameState
 {
@@ -38,8 +38,8 @@ class Game
     [[nodiscard]] std::optional<Piece *> operator[](const Coordinates &coordinates);
 
   private:
-    Color m_CurrentPlayer;
-    GameState m_State;
-    Board m_Board;
+    Color m_current_player;
+    GameState m_state;
+    Board m_board;
 };
-} // namespace game
+} // namespace Game

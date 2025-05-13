@@ -4,10 +4,10 @@
 #include "../move.h"
 #include <vector>
 
-#define Board std::array<std::array<std::optional<game::Piece *>, 8>, 8>
+#define Board std::array<std::array<std::optional<::Game::Piece *>, 8>, 8>
 #define BOARD_AT(coords) board[coords.GetRank()][coords.GetFile()]
 
-namespace game
+namespace Game
 {
 class Piece
 {
@@ -27,12 +27,12 @@ class Piece
     // !! The only danger is that this does not check if the move would put the king in check !!
     // This also performs some clean-up and game state updates (king is mated, in check, etc)
     // Due to the complexity of checking for mate, we sometimes require to "simulate" moves on a
-    // deep-copied board. As such, the protected `MakeMove` overload with the extra bool is what
+    // deep-copied board. As such, the protected `_MakeMove` overload with the extra bool is what
     // contains the true implementation. Some child pieces override that method to perform
     // additional updates related to their own state
     void MakeMove(Board &board, Move move)
     {
-        MakeMove(board, move, false);
+        _MakeMove(board, move, false);
     }
 
     virtual ~Piece();
@@ -43,14 +43,14 @@ class Piece
     // Extremely useful for implementing rook+bishok+queen. Given directional offsets, it will
     // traverse the board in that direction until it hits a piece or goes out of bounds.
     [[nodiscard]] std::vector<Move>
-    GetNaiveMovesInDirections(Board &board, std::vector<std::array<short, 2>> offsets) const;
+    _GetNaiveMovesInDirections(Board &board, std::vector<std::array<short, 2>> offsets) const;
 
-    virtual void MakeMove(Board &board, Move move, bool simulate);
+    virtual void _MakeMove(Board &board, Move move, bool simulate);
 
-    Color m_Color;
-    Coordinates m_Coordinates;
+    Color m_color;
+    Coordinates m_coordinates;
 };
 
 Board CloneBoard(Board &board);
 void FreeBoard(Board &board);
-} // namespace game
+} // namespace Game

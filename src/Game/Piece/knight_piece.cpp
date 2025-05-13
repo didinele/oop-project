@@ -1,7 +1,7 @@
 #include "knight_piece.h"
 #include <vector>
 
-namespace game
+namespace Game
 {
 KnightPiece::KnightPiece(Color color, Coordinates coords) : Piece(color, coords)
 {
@@ -18,8 +18,8 @@ std::vector<Move> KnightPiece::GetPossibleMoves(Board &board) const
         auto file_offset = offset[1];
 
         auto to = Coordinates(
-            m_Coordinates.GetRank() + rank_offset,
-            m_Coordinates.GetFile() + file_offset
+            m_coordinates.GetRank() + rank_offset,
+            m_coordinates.GetFile() + file_offset
         );
 
         if (!to.IsValid())
@@ -30,14 +30,14 @@ std::vector<Move> KnightPiece::GetPossibleMoves(Board &board) const
         auto piece = BOARD_AT(to);
         if (piece.has_value())
         {
-            if (piece.value()->GetColor() != m_Color)
+            if (piece.value()->GetColor() != m_color)
             {
-                moves.push_back(Move(m_Coordinates, to));
+                moves.push_back(Move(m_coordinates, to));
             }
         }
         else
         {
-            moves.push_back(Move(m_Coordinates, to));
+            moves.push_back(Move(m_coordinates, to));
         }
     }
 
@@ -46,6 +46,6 @@ std::vector<Move> KnightPiece::GetPossibleMoves(Board &board) const
 
 Piece *KnightPiece::Clone() const
 {
-    return new KnightPiece(m_Color, m_Coordinates);
+    return new KnightPiece(m_color, m_coordinates);
 }
-} // namespace game
+} // namespace Game

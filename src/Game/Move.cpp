@@ -1,6 +1,6 @@
 #include "move.h"
 
-namespace game
+namespace Game
 {
 std::vector<Move> Move::GetPromotionMoves(Coordinates from, Coordinates to)
 {
@@ -33,4 +33,4 @@ Move::Move(Coordinates from, Coordinates to, PromotionKind promotionKind, Castle
     : from(from), to(to), promotionKind(promotionKind), castleKind(castleKind)
 {
 }
-} // namespace game
+} // namespace Game

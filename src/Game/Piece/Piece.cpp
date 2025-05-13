@@ -9,23 +9,23 @@
 #include <cassert>
 #include <optional>
 
-namespace game
+namespace Game
 {
-Piece::Piece(Color m_Color, Coordinates coords) : m_Color(m_Color), m_Coordinates(coords)
+Piece::Piece(Color color, Coordinates coords) : m_color(color), m_coordinates(coords)
 {
 }
 Piece::~Piece() = default;
 Coordinates Piece::GetCoordinates() const
 {
-    return m_Coordinates;
+    return m_coordinates;
 }
 void Piece::SetCoordinates(Coordinates coords)
 {
-    m_Coordinates = coords;
+    m_coordinates = coords;
 }
 Color Piece::GetColor() const
 {
-    return m_Color;
+    return m_color;
 }
 std::vector<Piece *> Piece::GetSeenBy(Board &board) const
 {
@@ -42,7 +42,7 @@ std::vector<Piece *> Piece::GetSeenBy(Board &board) const
             }
 
             auto piece = option.value();
-            if (piece->GetColor() == m_Color)
+            if (piece->GetColor() == m_color)
             {
                 continue;
             }
@@ -51,12 +51,12 @@ std::vector<Piece *> Piece::GetSeenBy(Board &board) const
             for (auto &move : moves)
             {
                 // Edge case with pawns preventing certain things by "seeing" above them
-                if (dynamic_cast<PawnPiece *>(piece) != nullptr && move.to.GetRank() == m_Coordinates.GetRank())
+                if (dynamic_cast<PawnPiece *>(piece) != nullptr && move.to.GetRank() == m_coordinates.GetRank())
                 {
                     continue;
                 }
 
-                if (move.to == m_Coordinates)
+                if (move.to == m_coordinates)
                 {
                     out.push_back(piece);
                 }
@@ -67,9 +67,9 @@ std::vector<Piece *> Piece::GetSeenBy(Board &board) const
     return out;
 }
 
-void Piece::MakeMove(Board &board, Move move, bool simulate)
+void Piece::_MakeMove(Board &board, Move move, bool simulate)
 {
-    auto scope = util::Debugger::CreateScope("Piece::MakeMove");
+    auto scope = Util::Debugger::CreateScope("Piece::MakeMove");
 
     auto &to = BOARD_AT(move.to);
 
@@ -151,7 +151,7 @@ void Piece::MakeMove(Board &board, Move move, bool simulate)
             auto piece = option.value();
             // For one, given a move was made, all pawns of the current color lose the en passant
             // state (if they had it)
-            if (piece->GetColor() == m_Color)
+            if (piece->GetColor() == m_color)
             {
                 auto pawn = dynamic_cast<PawnPiece *>(piece);
                 if (pawn != nullptr)
@@ -160,7 +160,7 @@ void Piece::MakeMove(Board &board, Move move, bool simulate)
                 }
             }
 
-            if (enemy_king == nullptr && piece->GetColor() != m_Color)
+            if (enemy_king == nullptr && piece->GetColor() != m_color)
             {
                 enemy_king = dynamic_cast<KingPiece *>(piece);
             }
@@ -198,7 +198,7 @@ void Piece::MakeMove(Board &board, Move move, bool simulate)
 
                     auto piece =
                         temp_board[test_move.from.GetRank()][test_move.from.GetFile()].value();
-                    piece->MakeMove(temp_board, test_move, true);
+                    piece->_MakeMove(temp_board, test_move, true);
 
                     // Step 3. Check if the king is still in check after the move
                     // First, we need to find the king on the copied board. Given
@@ -231,7 +231,7 @@ void Piece::MakeMove(Board &board, Move move, bool simulate)
 }
 
 std::vector<Move>
-Piece::GetNaiveMovesInDirections(Board &board, std::vector<std::array<short, 2>> offsets) const
+Piece::_GetNaiveMovesInDirections(Board &board, std::vector<std::array<short, 2>> offsets) const
 {
     std::vector<Move> out;
 
@@ -243,8 +243,8 @@ Piece::GetNaiveMovesInDirections(Board &board, std::vector<std::array<short, 2>>
         while (true)
         {
             auto to = Coordinates(
-                m_Coordinates.GetRank() + rank_offset,
-                m_Coordinates.GetFile() + file_offset
+                m_coordinates.GetRank() + rank_offset,
+                m_coordinates.GetFile() + file_offset
             );
             if (!to.IsValid())
             {
@@ -254,15 +254,15 @@ Piece::GetNaiveMovesInDirections(Board &board, std::vector<std::array<short, 2>>
             auto piece = BOARD_AT(to);
             if (piece.has_value())
             {
-                if (piece.value()->GetColor() != m_Color)
+                if (piece.value()->GetColor() != m_color)
                 {
-                    out.push_back(Move(m_Coordinates, to));
+                    out.push_back(Move(m_coordinates, to));
                 }
 
                 break;
             }
 
-            out.push_back(Move(m_Coordinates, to));
+            out.push_back(Move(m_coordinates, to));
 
             rank_offset += offset[0];
             file_offset += offset[1];
@@ -308,4 +308,4 @@ void FreeBoard(Board &board)
         }
     }
 }
-} // namespace game
+} // namespace Game

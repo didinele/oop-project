@@ -1,7 +1,7 @@
 #include "queen_piece.h"
 #include <vector>
 
-namespace game
+namespace Game
 {
 QueenPiece::QueenPiece(Color color, Coordinates coords) : Piece(color, coords)
 {
@@ -9,7 +9,7 @@ QueenPiece::QueenPiece(Color color, Coordinates coords) : Piece(color, coords)
 
 std::vector<Move> QueenPiece::GetPossibleMoves(Board &board) const
 {
-    return GetNaiveMovesInDirections(
+    return _GetNaiveMovesInDirections(
         board,
         std::vector<std::array<short, 2>>{
             {1, -1},  // top left
@@ -26,6 +26,6 @@ std::vector<Move> QueenPiece::GetPossibleMoves(Board &board) const
 }
 Piece *QueenPiece::Clone() const
 {
-    return new QueenPiece(m_Color, m_Coordinates);
+    return new QueenPiece(m_color, m_coordinates);
 }
-} // namespace game
+} // namespace Game
