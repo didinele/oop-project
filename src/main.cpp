@@ -1,11 +1,10 @@
-// TODO: header_name.h
 // TODO: m_snake_case class members
 // TODO: PascalCase() methods
 // TODO: _PascalCase() private methods
 // TODO: This_Absurd_Namespace_Style
 
-#include "GUI/ChessGUI.h"
-#include "Util/Debug.h"
+#include "GUI/chess_gui.h"
+#include "Util/debug.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"

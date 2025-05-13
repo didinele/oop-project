@@ -1,12 +1,12 @@
-#include "Game.h"
-#include "../Util/Debug.h"
-#include "Piece/BishopPiece.h"
-#include "Piece/KingPiece.h"
-#include "Piece/KnightPiece.h"
-#include "Piece/PawnPiece.h"
-#include "Piece/Piece.h"
-#include "Piece/QueenPiece.h"
-#include "Piece/RookPiece.h"
+#include "game.h"
+#include "../Util/debug.h"
+#include "Piece/bishop_piece.h"
+#include "Piece/king_piece.h"
+#include "Piece/knight_piece.h"
+#include "Piece/pawn_piece.h"
+#include "Piece/piece.h"
+#include "Piece/queen_piece.h"
+#include "Piece/rook_piece.h"
 #include <optional>
 
 namespace game

@@ -1,4 +1,4 @@
-#include "RookPiece.h"
+#include "rook_piece.h"
 
 namespace game
 {

@@ -30,21 +30,21 @@ set(IMGUI_SOURCES
 add_executable(
     chess
 
-    src/Game/Piece/BishopPiece.cpp
-    src/Game/Piece/KingPiece.cpp
-    src/Game/Piece/KnightPiece.cpp
-    src/Game/Piece/PawnPiece.cpp
-    src/Game/Piece/Piece.cpp
-    src/Game/Piece/QueenPiece.cpp
-    src/Game/Piece/RookPiece.cpp
+    src/Game/Piece/bishop_piece.cpp
+    src/Game/Piece/king_piece.cpp
+    src/Game/Piece/knight_piece.cpp
+    src/Game/Piece/pawn_piece.cpp
+    src/Game/Piece/piece.cpp
+    src/Game/Piece/queen_piece.cpp
+    src/Game/Piece/rook_piece.cpp
 
-    src/Game/Coordinates.cpp
-    src/Game/Game.cpp
-    src/Game/Move.cpp
+    src/Game/coordinates.cpp
+    src/Game/game.cpp
+    src/Game/move.cpp
 
-    src/GUI/ChessGUI.cpp
+    src/GUI/chess_gui.cpp
 
-    src/Util/Debug.cpp
+    src/Util/debug.cpp
 
     src/main.cpp
 

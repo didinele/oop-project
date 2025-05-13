@@ -1,4 +1,4 @@
-#include "QueenPiece.h"
+#include "queen_piece.h"
 #include <vector>
 
 namespace game

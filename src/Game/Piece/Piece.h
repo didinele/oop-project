@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Coordinates.h"
-#include "../Move.h"
+#include "../coordinates.h"
+#include "../move.h"
 #include <vector>
 
 #define Board std::array<std::array<std::optional<game::Piece *>, 8>, 8>

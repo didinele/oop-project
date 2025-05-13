@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Game/Game.h"
-#include "../Game/Move.h"
+#include "../Game/game.h"
+#include "../Game/move.h"
 #include <imgui.h>
 #include <imgui_impl_opengl3_loader.h>
 #include <optional>

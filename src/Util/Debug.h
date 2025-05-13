@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdarg>
+
 namespace util
 {
 class ScopedDebugger

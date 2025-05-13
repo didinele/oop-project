@@ -1,5 +1,5 @@
-#include "PawnPiece.h"
-#include "../../Util/Debug.h"
+#include "pawn_piece.h"
+#include "../../Util/debug.h"
 #include <vector>
 
 // For all intents and purposes, "up" can mean down for black.

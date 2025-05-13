@@ -1,6 +1,6 @@
-#include "KingPiece.h"
-#include "../../Util/Debug.h"
-#include "RookPiece.h"
+#include "king_piece.h"
+#include "../../Util/debug.h"
+#include "rook_piece.h"
 #include <cassert>
 #include <vector>
 

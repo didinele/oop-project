@@ -1,7 +1,7 @@
 #pragma once
 
-#include "./Piece/Piece.h"
-#include "Coordinates.h"
+#include "./Piece/piece.h"
+#include "coordinates.h"
 #include <optional>
 
 namespace game

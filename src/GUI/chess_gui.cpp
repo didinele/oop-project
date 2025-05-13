@@ -1,15 +1,15 @@
 // No idea how this header is written, but if its not our first include, we aren't compiling
 #include <OpenGL/gl3.h>
 
-#include "../Game/Piece/BishopPiece.h"
-#include "../Game/Piece/KingPiece.h"
-#include "../Game/Piece/KnightPiece.h"
-#include "../Game/Piece/PawnPiece.h"
-#include "../Game/Piece/Piece.h"
-#include "../Game/Piece/QueenPiece.h"
-#include "../Game/Piece/RookPiece.h"
-#include "../Util/Debug.h"
-#include "ChessGUI.h"
+#include "../Game/Piece/bishop_piece.h"
+#include "../Game/Piece/king_piece.h"
+#include "../Game/Piece/knight_piece.h"
+#include "../Game/Piece/pawn_piece.h"
+#include "../Game/Piece/piece.h"
+#include "../Game/Piece/queen_piece.h"
+#include "../Game/Piece/rook_piece.h"
+#include "../Util/debug.h"
+#include "chess_gui.h"
 #include "imgui.h"
 #include <algorithm>
 #include <iostream>

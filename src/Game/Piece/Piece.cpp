@@ -1,11 +1,11 @@
-#include "Piece.h"
-#include "../../Util/Debug.h"
-#include "BishopPiece.h"
-#include "KingPiece.h"
-#include "KnightPiece.h"
-#include "PawnPiece.h"
-#include "QueenPiece.h"
-#include "RookPiece.h"
+#include "piece.h"
+#include "../../Util/debug.h"
+#include "bishop_piece.h"
+#include "king_piece.h"
+#include "knight_piece.h"
+#include "pawn_piece.h"
+#include "queen_piece.h"
+#include "rook_piece.h"
 #include <cassert>
 #include <optional>
 
