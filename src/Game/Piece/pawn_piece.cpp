@@ -24,7 +24,7 @@ std::vector<Move> PawnPiece::GetPossibleMoves(Board &board) const
 
     auto rank_offset = m_color == Color::White ? 1 : -1;
 
-    auto one_up = m_coordinates.NewWithRank(m_coordinates.GetRank() + rank_offset);
+    auto one_up = m_coordinates + RankOffset(rank_offset);
     if (one_up.IsValid() && !BOARD_AT(one_up).has_value())
     {
         if (one_up.IsPromotionSquare(m_color))
@@ -38,7 +38,7 @@ std::vector<Move> PawnPiece::GetPossibleMoves(Board &board) const
             out.push_back(Move(m_coordinates, one_up));
         }
 
-        auto two_up = one_up.NewWithRank(one_up.GetRank() + rank_offset);
+        auto two_up = one_up + RankOffset(rank_offset);
         if (!m_moved && two_up.IsValid() && !BOARD_AT(two_up).has_value())
         {
             if (two_up.IsPromotionSquare(m_color))
@@ -54,7 +54,7 @@ std::vector<Move> PawnPiece::GetPossibleMoves(Board &board) const
         }
     }
 
-    auto left = one_up.NewWithFile(one_up.GetFile() - 1);
+    auto left = one_up + FileOffset(-1);
     if (left.IsValid() && BOARD_AT(left).has_value() &&
         BOARD_AT(left).value()->GetColor() != m_color)
     {
@@ -70,7 +70,7 @@ std::vector<Move> PawnPiece::GetPossibleMoves(Board &board) const
         }
     }
 
-    auto right = one_up.NewWithFile(one_up.GetFile() + 1);
+    auto right = one_up + FileOffset(1);
     if (right.IsValid() && BOARD_AT(right).has_value() &&
         BOARD_AT(right).value()->GetColor() != m_color)
     {
@@ -118,7 +118,7 @@ void PawnPiece::_MakeMove(Board &board, Move move, bool simulate)
         auto offset = m_color == Color::White ? -1 : 1;
 
         // Check if enemy pawns can en passant ours
-        auto left = move.to.NewWithFile(move.to.GetFile() - 1);
+        auto left = move.to + FileOffset(-1);
         if (left.IsValid() && BOARD_AT(left).has_value())
         {
             auto pawn = dynamic_cast<PawnPiece *>(BOARD_AT(left).value());
@@ -134,7 +134,7 @@ void PawnPiece::_MakeMove(Board &board, Move move, bool simulate)
             }
         }
 
-        auto right = move.to.NewWithFile(move.to.GetFile() + 1);
+        auto right = move.to + FileOffset(1);
         if (right.IsValid() && BOARD_AT(right).has_value())
         {
             auto pawn = dynamic_cast<PawnPiece *>(BOARD_AT(right).value());

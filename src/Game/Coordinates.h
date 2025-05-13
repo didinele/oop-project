@@ -10,7 +10,15 @@ enum class Color
     Black,
 };
 
-// TODO: + overloads
+struct RankOffset
+{
+   short value;
+};
+struct FileOffset
+{
+    short value;
+};
+
 class Coordinates
 {
   public:
@@ -19,9 +27,6 @@ class Coordinates
     [[nodiscard]] short GetRank() const;
     [[nodiscard]] short GetFile() const;
 
-    [[nodiscard]] Coordinates NewWithRank(short rank) const;
-    [[nodiscard]] Coordinates NewWithFile(short file) const;
-
     [[nodiscard]] std::string ToString() const;
 
     [[nodiscard]] bool IsValid() const;
@@ -29,6 +34,10 @@ class Coordinates
 
     bool operator==(const Coordinates &other) const;
     bool operator!=(const Coordinates &other) const;
+
+    [[nodiscard]] Coordinates operator+(const Coordinates &other) const;
+    [[nodiscard]] Coordinates operator+(const RankOffset &rank) const;
+    [[nodiscard]] Coordinates operator+(const FileOffset &file) const;
 
   private:
     short m_rank;

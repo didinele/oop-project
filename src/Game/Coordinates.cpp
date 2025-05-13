@@ -16,15 +16,6 @@ short Coordinates::GetFile() const
     return m_file;
 }
 
-Coordinates Coordinates::NewWithRank(short rank) const
-{
-    return Coordinates(rank, m_file);
-}
-Coordinates Coordinates::NewWithFile(short file) const
-{
-    return Coordinates(m_rank, file);
-}
-
 std::string Coordinates::ToString() const
 {
     static const char file_names[8] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
@@ -52,5 +43,20 @@ bool Coordinates::operator==(const Coordinates &other) const
 bool Coordinates::operator!=(const Coordinates &other) const
 {
     return !(*this == other);
+}
+
+Coordinates Coordinates::operator+(const Coordinates &other) const
+{
+    return Coordinates(m_rank + other.m_rank, m_file + other.m_file);
+}
+
+Coordinates Coordinates::operator+(const RankOffset &rank) const
+{
+    return Coordinates(m_rank + rank.value, m_file);
+}
+
+Coordinates Coordinates::operator+(const FileOffset &file) const
+{
+    return Coordinates(m_rank, m_file + file.value);
 }
 } // namespace Game
