@@ -137,7 +137,8 @@ bool Game::MakeMove(Move move)
     FreeBoard(m_board);
     m_board = clone;
 
-    m_state = king->GetIsMated() || enemy_king->GetIsMated() ? GameState::Ended : GameState::Waiting;
+    m_state =
+        king->GetIsMated() || enemy_king->GetIsMated() ? GameState::Ended : GameState::Waiting;
     m_current_player = m_current_player == Color::White ? Color::Black : Color::White;
 
     return true;

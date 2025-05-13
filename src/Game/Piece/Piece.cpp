@@ -51,7 +51,8 @@ std::vector<Piece *> Piece::GetSeenBy(Board &board) const
             for (auto &move : moves)
             {
                 // Edge case with pawns preventing certain things by "seeing" above them
-                if (dynamic_cast<PawnPiece *>(piece) != nullptr && move.to.GetRank() == m_coordinates.GetRank())
+                if (dynamic_cast<PawnPiece *>(piece) != nullptr &&
+                    move.to.GetRank() == m_coordinates.GetRank())
                 {
                     continue;
                 }
