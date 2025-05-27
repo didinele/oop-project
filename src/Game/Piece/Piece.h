@@ -2,6 +2,8 @@
 
 #include "../coordinates.h"
 #include "../move.h"
+#include <array>
+#include <optional>
 #include <vector>
 
 #define Board std::array<std::array<std::optional<::Game::Piece *>, 8>, 8>

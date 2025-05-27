@@ -58,7 +58,11 @@ target_include_directories(chess PRIVATE
     ${IMGUI_DIR}/misc/cpp
 )
 
-target_compile_options(chess PRIVATE -Wall -Wextra -Wpedantic -Werror)
+if (MSVC)
+    target_compile_options(chess PRIVATE /W4)
+else()
+    target_compile_options(chess PRIVATE -Werror -Wextra -Wall -pedantic)
+endif()
 
 target_link_libraries(chess PRIVATE
     glfw
@@ -66,4 +70,8 @@ target_link_libraries(chess PRIVATE
 )
 
 # Copy the resources directory to the build output directory
-file(COPY resources DESTINATION ${CMAKE_BINARY_DIR})
+if (MSVC)
+    file(COPY resources DESTINATION ${CMAKE_BINARY_DIR}/Debug)
+else()
+    file(COPY resources DESTINATION ${CMAKE_BINARY_DIR})
+endif()

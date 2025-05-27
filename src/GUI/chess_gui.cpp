@@ -1,5 +1,5 @@
-// No idea how this header is written, but if its not our first include, we aren't compiling
-#include <OpenGL/gl3.h>
+// Neded for windows
+#define NOMINMAX
 
 #include "../Game/Piece/bishop_piece.h"
 #include "../Game/Piece/king_piece.h"
@@ -614,7 +614,17 @@ bool ChessGUI::_LoadPiecesTexture(const char *filename)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     // Upload texture data
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        /* GL_RGBA */ 0x8058,
+        width,
+        height,
+        0,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        data
+    );
 
     // Free image data
     stbi_image_free(data);
