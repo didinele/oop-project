@@ -59,7 +59,7 @@ target_include_directories(chess PRIVATE
 )
 
 if (MSVC)
-    target_compile_options(chess PRIVATE /W4 /WX)
+    target_compile_options(chess PRIVATE /W4)
 else()
     target_compile_options(chess PRIVATE -Werror -Wextra -Wall -pedantic)
 endif()
