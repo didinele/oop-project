@@ -1,3 +1,6 @@
+// for windows builds
+#define NOMINMAX
+
 #include "../Game/Piece/bishop_piece.h"
 #include "../Game/Piece/king_piece.h"
 #include "../Game/Piece/knight_piece.h"
