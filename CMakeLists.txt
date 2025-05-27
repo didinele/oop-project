@@ -59,7 +59,6 @@ target_include_directories(chess PRIVATE
 )
 
 if (MSVC)
-    target_compile_definitions(chess PRIVATE WIN32_LEAN_AND_MEAN)
     target_compile_options(chess PRIVATE /W4)
 else()
     target_compile_options(chess PRIVATE -Werror -Wextra -Wall -pedantic)
