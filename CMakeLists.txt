@@ -58,7 +58,11 @@ target_include_directories(chess PRIVATE
     ${IMGUI_DIR}/misc/cpp
 )
 
-target_compile_options(chess PRIVATE -Wall -Wextra -Wpedantic -Werror)
+if (MSVC)
+    target_compile_options(chess PRIVATE /W4 /WX)
+else()
+    target_compile_options(chess PRIVATE -Werror -Wextra -Wall -pedantic)
+endif()
 
 target_link_libraries(chess PRIVATE
     glfw
