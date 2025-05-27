@@ -70,4 +70,8 @@ target_link_libraries(chess PRIVATE
 )
 
 # Copy the resources directory to the build output directory
-file(COPY resources DESTINATION ${CMAKE_BINARY_DIR})
+if (MSVC)
+    file(COPY resources DESTINATION ${CMAKE_BINARY_DIR}/Debug)
+else()
+    file(COPY resources DESTINATION ${CMAKE_BINARY_DIR})
+endif()
