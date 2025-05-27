@@ -9,3 +9,6 @@ $ cmake -B build
 $ cd build
 $ cmake --build .
 ```
+
+Once built, the executable can be immediately ran, on MacOS and Linux simply using `./chess`, while on Windows
+it can be found under `Debug\chess.exe`.
