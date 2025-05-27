@@ -13,13 +13,21 @@ namespace GUI
 class ChessGUI
 {
   public:
-    ChessGUI(Game::Game *game);
-    ~ChessGUI();
+    ChessGUI(const ChessGUI&) = delete;
+    ChessGUI& operator=(const ChessGUI&) = delete;
+
+    [[nodiscard]] static ChessGUI& GetInstance(Game::Game* game);
+    void DisposeInstance();
 
     void Render();
 
   private:
-    Game::Game *m_game;
+    ChessGUI(Game::Game* game);
+    ~ChessGUI();
+
+    static ChessGUI* s_instance;
+
+    Game::Game* m_game;
 
     // Draws
     bool m_draw_proposed = false;

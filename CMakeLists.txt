@@ -42,7 +42,10 @@ add_executable(
     src/Game/game.cpp
     src/Game/move.cpp
 
-    src/GUI/chess_gui.cpp
+    src/GUI/chess_gui_core.cpp
+    src/GUI/chess_gui_input.cpp
+    src/GUI/chess_gui_render.cpp
+    src/GUI/gui_bootstrap.cpp
 
     src/Util/debug.cpp
 
